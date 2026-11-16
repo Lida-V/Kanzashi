@@ -1,5 +1,11 @@
 # 変更履歴
 
+## 未リリース
+
+- スキル：工程の位置を決まりにした。頭と髪のパーツ分けの後、テクスチャを貼り直す前に行う。手順 0 で順番を確かめ、逆のときはユーザーに聞く。
+
+English: the skill now fixes the place in the pipeline (after the head and the hair are split into parts, before the textures are redone) and checks it in step 0.
+
 ## 0.4.0（試作）
 
 - エージェント向けのスキル `skills/kanzashi/SKILL.md`（英語は `SKILL.en.md`）と入口 `AGENTS.md`。髪の調整の流れと、ユーザーに確認する所を決めた。

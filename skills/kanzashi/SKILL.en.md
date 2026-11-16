@@ -13,7 +13,17 @@ This skill says **when and in what order an agent uses it, and where it stops to
 - The user asks to fix the flow of the hair, or to move strands out of an arm or the body.
 - A clean UV per strand is needed before the hair texture is made again.
 
-Within the making of a character, do it **after the shape and place of the hair are settled and before the hair texture is redone**. The detection cuts the mesh along the strand borders (the vertex count grows), so do it before rigging and shape keys when you can. It also runs on rigged hair; then move the bones after the detection and check that the hair still follows the body.
+### Place in the pipeline (a rule)
+
+**Do it at the stage where the head and the hair have been split into separate parts, before the textures are redone.** The order is:
+
+1. Split the head and the hair into parts (the shape and place of the hair are settled here too)
+2. Kanzashi (detecting strands, repainting, bending, checking for buried strands, the UV per strand)
+3. Redo the hair texture
+
+- When the head and the hair are still one mesh, split them first. The detection puts every face of the mesh it is given into some strand, so faces of the face or the scalp left in the hair become strands too.
+- Done after the textures were redone, it changes the UV and the texturing has to be done again. When the order is reversed, tell the user in step 0 and decide together.
+- The detection cuts the mesh along the strand borders (the vertex count grows), so do it before rigging and shape keys when you can. It also runs on rigged hair; then move the bones after the detection and check that the hair still follows the body.
 
 Do not use it when the hair is already separate strand parts, when it is made of hair cards only, or when Blender is older than 5.3.
 
@@ -34,7 +44,12 @@ Do not use it when the hair is already separate strand parts, when it is made of
 
 1. Find Blender and check its version (5.3 or later).
 2. Find the file and the names of the hair meshes. Meshes whose name or material names contain hair, bangs and the like are taken automatically. If an ornament might be taken, or the hair missed, name them with `--hair NAME`.
-3. Check whether the add-on is installed.
+3. Check the place in the pipeline (see above): is the hair a mesh of its own, apart from the head, and has the hair texture already been redone? Look at the file and at the production notes.
+
+★ When the head and the hair are not split: say "the head and the hair have to be split into parts first" and do not start the detection until that is done.
+★ When the hair texture has already been redone: say "making the strand UV means the redone texture cannot be used as it is" and ask: (a) transfer the current look to the new UV (the swap of step 6; fine detail changes a little), (b) redo the texture after Kanzashi, (c) stop.
+
+4. Check whether the add-on is installed.
 
 ```bash
 python <repo>/tools/install_addon.py --check

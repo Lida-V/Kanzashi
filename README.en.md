@@ -55,6 +55,8 @@ The panel changes at once. A few texts that Blender reads only when the add-on i
 
 ## Order of work
 
+Within the making of a character, do this **after the head and the hair are split into separate parts and before the textures are redone** (a texture made for the old UV cannot be used as it is once the strand UV exists).
+
 **Always work in a copy of your model file.** The detection cuts the mesh along the strand borders (the vertex count grows).
 
 1. Press "Auto register" in step 1. Remove wrong entries with the X.
