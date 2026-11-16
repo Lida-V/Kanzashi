@@ -7,7 +7,7 @@ Tripo などの 3D 生成サービスで作った、ひとかたまりの髪を�
 
 **Kanzashi — hair strand tool for Blender**: splits an AI-generated hair mesh into strands, lets you fix the split by painting, bends each strand by a wire, and makes a UV map per strand (check, export for texturing, swap).
 
-- 版：0.4.0（試作）。非公開のリポジトリです。
+- 版：0.4.1（試作）。非公開のリポジトリです。
 - 確かめた環境：Blender 5.3.0、Windows 11。ほかの版では試していません。
 - 作者：Lida
 - パネルの言語：日本語と英語（下の「言語」）
@@ -27,7 +27,7 @@ Tripo などの 3D 生成サービスで作った、ひとかたまりの髪を�
 
 ## 入れ方（アドオン）
 
-1. `Kanzashi-addon-0.4.0.zip` を用意します（`python tools/build_packages.py` で `dist/` に出来ます）。
+1. `Kanzashi-addon-0.4.1.zip` を用意します（`python tools/build_packages.py` で `dist/` に出来ます）。
 2. Blender の「編集 > プリファレンス > アドオン」の右上のメニューから「ディスクからインストール」を選び、ZIP を指定します（拡張機能として入ります）。
 3. 「Kanzashi」を有効にします。
 4. 3D ビューでサイドバー（N キー）を開くと、「Kanzashi」のタブがあります。
@@ -83,7 +83,7 @@ AI エージェントにこのリポジトリを読ませると、[AGENTS.md](AG
 
 ## パネルなしで動かす（スクリプト）
 
-`Kanzashi-scripts-0.4.0.zip` を展開して、背景実行で使います。開いたファイルは保存しません。出力先がすでにあると止まります。
+`Kanzashi-scripts-0.4.1.zip` を展開して、背景実行で使います。開いたファイルは保存しません。出力先がすでにあると止まります。
 
 ```bash
 blender -b model.blend --python kanzashi_run.py -- --out model_kanzashi.blend --export hair.fbx --report report.json

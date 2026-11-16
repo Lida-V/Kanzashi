@@ -5,7 +5,7 @@
 A Blender tool that splits a generated hair mesh into strands, lets you fix the split by painting, bends each strand by a wire, and makes a UV map with one island per strand.
 It is made for hair that comes out of 3D generation services such as Tripo as one fused lump.
 
-- Version: 0.4.0 (prototype). This repository is private.
+- Version: 0.4.1 (prototype). This repository is private.
 - Tested with: Blender 5.3.0 on Windows 11. Other versions are untested.
 - Author: Lida
 - Panel languages: Japanese and English (see "Language" below).
@@ -25,7 +25,7 @@ It is made for hair that comes out of 3D generation services such as Tripo as on
 
 ## Install (add-on)
 
-1. Get `Kanzashi-addon-0.4.0.zip` (`python tools/build_packages.py` makes it in `dist/`).
+1. Get `Kanzashi-addon-0.4.1.zip` (`python tools/build_packages.py` makes it in `dist/`).
 2. In Blender, open Edit > Preferences > Add-ons, choose "Install from Disk" in the menu at the top right, and pick the ZIP (it is installed as an extension).
 3. Enable "Kanzashi".
 4. Open the sidebar of the 3D viewport (N key). There is a "Kanzashi" tab.
@@ -83,7 +83,7 @@ The brush paints whole faces, so the size of the faces is the finest detail you 
 
 ## Without the panel (script)
 
-Unpack `Kanzashi-scripts-0.4.0.zip` and run it in the background. The opened file is not saved. It stops if the output already exists.
+Unpack `Kanzashi-scripts-0.4.1.zip` and run it in the background. The opened file is not saved. It stops if the output already exists.
 
 ```bash
 blender -b model.blend --python kanzashi_run.py -- --out model_kanzashi.blend --export hair.fbx --report report.json

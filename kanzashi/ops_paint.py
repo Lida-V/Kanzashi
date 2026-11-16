@@ -33,6 +33,8 @@ class KANZASHI_OT_start(bpy.types.Operator):
     bl_description = "髪を色そのままで表示し、スポイトとブラシが使える状態にします"
 
     def execute(self, context):
+        if bending(context):  # one mode at a time: the grips are written into the wire and removed
+            bpy.ops.kanzashi.bend(on=False)
         hair = _current(context)
         if not _detected(hair) or not enter_paint(context, hair):
             self.report({"ERROR"}, T("先に ② の検出を実行してください"))

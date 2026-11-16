@@ -14,6 +14,7 @@ from .ops_bend import (
     KANZASHI_OT_bend_pick,
     KANZASHI_OT_escape,
     KANZASHI_OT_finalize,
+    KANZASHI_OT_grip,
     KANZASHI_OT_quit,
 )
 from .ops_hair import (
@@ -176,6 +177,9 @@ class KANZASHI_PT_main(bpy.types.Panel):
             box.label(text=T("ワイヤー %d を曲げています") % int(sc.get("lida_hs_bend_wire", -1)))
             col = box.column(align=True)
             col.label(text=T("丸いつまみをクリックして G で動かす"))
+            col.label(text=T("R で回す（ワイヤーの向きが変わる）"))
+            col.label(text=T("動かしている間も、中ボタンで視点を回せます"))
+            col.label(text=T("X・Y・Z で軸を固定、Shift でゆっくり"))
             col.label(text=T("髪の面か一覧をクリック：その毛束に切り替え"))
             col.label(text=T("Esc：選択を外す → もう一度で終わる"))
             col.label(text=T("Shift+クリックで複数選べます"))
@@ -247,6 +251,7 @@ CLASSES = (
     KANZASHI_OT_size,
     KANZASHI_OT_bend,
     KANZASHI_OT_bend_pick,
+    KANZASHI_OT_grip,
     KANZASHI_OT_escape,
     KANZASHI_OT_quit,
     KANZASHI_OT_finalize,
@@ -334,6 +339,11 @@ def register():
                 for shift in (False, True):
                     kmi = km2.keymap_items.new("kanzashi.bend_pick", "LEFTMOUSE", value, shift=shift, head=True)
                     _keys.append((km2, kmi))
+        km4 = kc.keymaps.new(name="Object Mode", space_type="EMPTY")
+        for key, kind in (("G", "MOVE"), ("R", "TURN")):  # only while a grip is selected; else it passes through
+            kmi = km4.keymap_items.new("kanzashi.grip", key, "PRESS", head=True)
+            kmi.properties.kind = kind
+            _keys.append((km4, kmi))
         for name in ("Vertex Paint", "Object Mode"):
             km3 = kc.keymaps.new(name=name, space_type="EMPTY")
             kmi = km3.keymap_items.new("kanzashi.escape", "ESC", "PRESS", head=True)

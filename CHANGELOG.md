@@ -6,6 +6,14 @@
 
 English: the skill now fixes the place in the pipeline (after the head and the hair are split into parts, before the textures are redone) and checks it in step 0.
 
+## 0.4.1（試作）
+
+- ③ と ④ は、どちらか片方だけが動くようにした。「色を直すモードに入る」を押すと、曲げている最中ならつまみを書き戻して消してから入る（逆向きは前からそうなっていた）。
+- つまみの G（動かす）と R（回す）を、Kanzashi の操作にした（つまみを選んでいる間だけ。ほかの物の G・R は Blender のまま）。動かしている・回している最中も、中ボタンのドラッグとホイールで視点を変えられる。クリックで決定、右クリック・Esc で取り消し、X・Y・Z で軸、Shift でゆっくり。数値の入力はできない。
+- つまみを R で回すと、その点でワイヤーの向きが変わり、毛束が付いてくる。回した点は、曲げ終わった後も向きを保つ（ハンドルを「整列」にして書き戻す）。動かしただけの点は、今までどおり自動でなめらかにする。
+
+English: steps 3 and 4 are now exclusive (entering the colour mode ends bending); G and R on a handle are Kanzashi's own, so the view can be orbited with the middle button meanwhile; R turns a handle, which changes the direction of the wire there, and the turn is kept after bending ends.
+
 ## 0.4.0（試作）
 
 - エージェント向けのスキル `skills/kanzashi/SKILL.md`（英語は `SKILL.en.md`）と入口 `AGENTS.md`。髪の調整の流れと、ユーザーに確認する所を決めた。

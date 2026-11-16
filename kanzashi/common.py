@@ -455,15 +455,31 @@ def end_bend(context):
     grips = _grips(context)
     if hair is not None and grips and k >= 0:
         w = _wires(context, hair)
+        inv = w.matrix_world.inverted()
+        moves = {}  # grip number -> what its hook does to the three points it holds (wire space)
+        for i, g in enumerate(grips):
+            md = w.modifiers.get("lida_grip_%02d" % i)
+            if md is not None:
+                moves[i] = inv @ g.matrix_world @ md.matrix_inverse
         for m in [m for m in w.modifiers if m.name.startswith("lida_grip")]:
             w.modifiers.remove(m)
         if k < len(w.data.splines):
-            inv = w.matrix_world.inverted()
             sp = w.data.splines[k]
-            for g, bp in zip(grips, sp.bezier_points):
-                bp.co = inv @ g.matrix_world.translation
-            for bp in sp.bezier_points:  # smooth handles for the new positions
-                bp.handle_left_type = bp.handle_right_type = "AUTO"
+            for i, (g, bp) in enumerate(zip(grips, sp.bezier_points)):
+                m = moves.get(i)
+                r = m.to_3x3() if m is not None else None
+                turned = (
+                    r is not None
+                    and max(abs(r[a][b] - (1.0 if a == b else 0.0)) for a in range(3) for b in range(3)) > 1e-4
+                )
+                if turned or (m is not None and bp.handle_left_type != "AUTO"):
+                    # a grip that was turned (now or earlier): its handles keep the direction it was given
+                    co, hl, hr = m @ bp.co, m @ bp.handle_left, m @ bp.handle_right
+                    bp.handle_left_type = bp.handle_right_type = "ALIGNED"
+                    bp.co, bp.handle_left, bp.handle_right = co, hl, hr
+                else:  # only moved: smooth handles for the new position
+                    bp.co = inv @ g.matrix_world.translation
+                    bp.handle_left_type = bp.handle_right_type = "AUTO"
         w.data.update_tag()
         w.hide_select = False
         if ED.HIDE_GROUP in hair.modifiers and not sc.get("lida_hs_bend_switch"):

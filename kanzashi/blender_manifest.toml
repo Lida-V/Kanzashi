@@ -1,7 +1,7 @@
 schema_version = "1.0.0"
 
 id = "kanzashi"
-version = "0.4.0"
+version = "0.4.1"
 name = "Kanzashi"
 tagline = "Hair strands of generated meshes: split, repaint, bend, UV"
 maintainer = "Lida"
