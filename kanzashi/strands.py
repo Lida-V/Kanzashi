@@ -10,14 +10,11 @@
 #   melted_field()     smooth value on the melted part: 0 at the crown, 1 where the strands leave it
 #   flow_line()        the line of steepest change of that value through the faces
 # Nothing here changes a mesh. Importing registers nothing.
-import os
-import sys
 
 import numpy as np
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import lida_hair_wire as W  # noqa: E402
-import lida_hair_rewire as R  # noqa: E402
+from . import wire as W
+from . import rewire as R
 
 
 def components(nb):

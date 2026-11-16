@@ -4,18 +4,15 @@
 #   blender file.blend --python panel.py
 # Sidebar (N) > "Kanzashi". Steps: 1 register the hair meshes, 2 find the strands (one wire and one colour per
 # strand), 3 fix wrong colours by painting, 4 bend by wires, 5 the strand UV, 6 finish.
-import os
-import sys
 
 import bpy
 import numpy as np
 from bpy_extras import view3d_utils
 from mathutils import kdtree
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import lida_hair_strands as S  # noqa: E402
-import lida_hair_tree as TR  # noqa: E402
-import lida_hair_i18n as LANG  # noqa: E402
+from . import strands as S
+from . import tree as TR
+from . import i18n as LANG
 
 T = LANG.T
 TR.TRANSLATE = T                # the progress texts of the slow steps

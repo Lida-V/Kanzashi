@@ -9,13 +9,10 @@
 #   strand_uv()     a second UV map: one strip per strand
 # The mesh keeps its vertices, faces and first UV map. Importing this file registers nothing.
 import math
-import os
-import sys
 
 import numpy as np
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import lida_hair_wire as W  # noqa: E402
+from . import wire as W
 
 GROUP = "LidaHairRewire"
 BIND_GROUP = "LidaHairRewireBind"
@@ -703,7 +700,7 @@ def detect(hair, wires, root, window=0.03, root_fade=0.04, max_tries=500, extend
 def refine_melted(hair, root, window=0.03, max_tries=500, cuts=1):
     """Cut the faces of the melted part (faces no strand section touches) into smaller ones, so the borders
     between parts can be finer than the original faces. The shape does not change. Returns faces cut."""
-    import bpy, bmesh
+    import bmesh
     P, T, inv, _world = gather(hair)
     strands, owner, _tries = detect_strands(P, T, np.asarray(root, float), window=window, max_tries=max_tries)
     cent = [np.array([s["centre"] for s in st["stations"]]) for st in strands]

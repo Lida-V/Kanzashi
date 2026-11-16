@@ -537,7 +537,7 @@ def to_srgb(c):
 def detect_and_bind(hair, wires_obj, root, cap_len=0.40, h=0.01, min_wire=0.05, cut=True, log=None, cap_rule="transport", root_fix=0.05):
     """Finds the strands of `hair`, makes one curve per strand in `wires_obj`, cuts the cap along the borders,
     colours the faces and ties every vertex to its wire. Changes the mesh of `hair` (work on a copy)."""
-    import lida_hair_strands as S
+    from . import strands as S
     R = S.R
     me = hair.data; root = np.asarray(root, float)
     P, T, inv, world = R.gather(hair)
@@ -697,7 +697,7 @@ def detect_and_bind(hair, wires_obj, root, cap_len=0.40, h=0.01, min_wire=0.05, 
 def rest_shift(hair):
     """How far the deform moves the hair right now (metres), other modifiers switched off for the check."""
     import bpy
-    import lida_hair_strands as S
+    from . import strands as S
     me = hair.data; dm = hair.modifiers.get(S.R.GROUP)
     others = [(m, m.show_viewport) for m in hair.modifiers if m is not dm]
     for m, _s in others:
@@ -733,7 +733,7 @@ def apply_repaint(hair, wires_obj, tol=0.12, changed_min=0.04, keep_min=6):
     vertices (they are tied to the new wire where it is now) and so its place in the strand UV. Painted faces are
     locked. Small pieces a wire is left with, cut off from the rest of it, join what surrounds them. Faces painted
     only partly, or with no wire's colour, go back to their own colour."""
-    import lida_hair_strands as S
+    from . import strands as S
     R = S.R
     me = hair.data; strand = face_strands(me); nf = len(strand)
     ca = me.color_attributes["lw_strand_col"]
@@ -884,7 +884,7 @@ def wire_table(hair, wires_obj):
 def new_wire(hair, wires_obj):
     """A new, empty wire (a new colour). Paint faces with it; when the painting is applied the wire's line is
     laid through those faces. Returns its id."""
-    import lida_hair_strands as S
+    from . import strands as S
     k = len(wires_obj.data.splines)
     S.R.add_spline(wires_obj, np.array([[0.0, 0.0, 0.0], [0.0, 0.0, -0.01]]), np.array([0.005, 0.005]))
     wires_obj["lw_kinds"] = list(wires_obj.get("lw_kinds", [])) + ["new"]
@@ -896,7 +896,7 @@ def new_wire(hair, wires_obj):
 
 def replace_spline(wires_obj, index, pos, rad):
     """Gives spline `index` new points and keeps every other spline, and the order, as it is."""
-    import lida_hair_strands as S
+    from . import strands as S
     cu = wires_obj.data; keep = []
     for sp in cu.splines:
         keep.append([(bp.co.copy(), bp.handle_left.copy(), bp.handle_right.copy(), bp.handle_left_type, bp.handle_right_type,
@@ -914,7 +914,7 @@ def replace_spline(wires_obj, index, pos, rad):
 def fit_wire(hair, wires_obj, k, strand=None):
     """Lays wire k through the middle of its faces, from the crown side to the tip side, and ties their vertices
     to it where it now lies."""
-    import lida_hair_strands as S
+    from . import strands as S
     R = S.R; me = hair.data
     strand = face_strands(me) if strand is None else strand
     if "lw_d" not in me.attributes:
@@ -956,7 +956,7 @@ def finalize(hair, wires_obj, keep_colours=True):
     the attributes that tie vertices to wires. The colour per strand (lw_strand, lw_strand_col) and the strand UV
     stay unless keep_colours is off. After this the hair is an ordinary mesh; to bend again, detect again."""
     import bpy
-    import lida_hair_strands as S
+    from . import strands as S
     R = S.R; me = hair.data
     if me.shape_keys is not None:
         raise RuntimeError("the mesh has shape keys; the bent shape cannot be written into it")
@@ -1016,7 +1016,7 @@ def strand_uv2(hair, wires_obj, name="LW_StrandUV", margin=0.004, method="MINIMU
     Other UV maps, the seams of the mesh, hidden faces and the selection are left as they were."""
     import heapq
     import bpy
-    import lida_hair_strands as S
+    from . import strands as S
     R = S.R; me = hair.data
     strand = face_strands(me); nf = len(strand)
     if bpy.context.mode != "OBJECT":
@@ -1447,7 +1447,7 @@ def fill_strandless(me):
 def drop_unused_groups():
     """Node groups of this tool that nothing uses any more (after finalize, after binding)."""
     import bpy
-    import lida_hair_strands as S
+    from . import strands as S
     R = S.R; gone = []
     for nm in (R.BIND_GROUP, R.GROUP, HIDE_GROUP):
         g = bpy.data.node_groups.get(nm)
@@ -1559,7 +1559,7 @@ def export_for_texture(hairs, path, name="LW_StrandUV"):
     are not changed: the mesh is built apart, exported and removed again. FBX or GLB by the file's ending."""
     import bpy
     import os
-    import lida_hair_strands as S
+    from . import strands as S
     R = S.R
     if bpy.context.mode != "OBJECT":
         bpy.ops.object.mode_set(mode="OBJECT")
