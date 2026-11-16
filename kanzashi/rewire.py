@@ -767,7 +767,6 @@ def detect(
         if np.isfinite(e0) and np.isfinite(e1) and e0 > e1:
             st["stations"] = st["stations"][::-1]
         st["fused_root"] = st["stations"][0].get("end") != "tip"
-    pre = owner.copy()
     cent = [np.array([s["centre"] for s in st["stations"]]) for st in strands]
     rad0 = []
     for st in strands:
@@ -948,7 +947,6 @@ def face_parts(hair, wires=None, colour="lw_part_col"):
         part[m] = g[strand[m] - b]
     me.attributes["lw_strand"].data.foreach_set("value", strand)
     me.attributes["lw_part"].data.foreach_set("value", part)
-    start = np.array([p.loop_start for p in me.polygons])
     total = np.array([p.loop_total for p in me.polygons])
     for nm, key, seed in ((colour, part, 1), ("lw_strand_col", strand, 7)):
         rng = np.random.default_rng(seed)

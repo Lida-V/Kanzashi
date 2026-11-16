@@ -341,7 +341,7 @@ def ensure_group():
     gin = N.new("NodeGroupInput")
     gout = N.new("NodeGroupOutput")
 
-    def I(name):
+    def I(name):  # noqa: E743
         return gin.outputs[name]
 
     def link(a, b):
