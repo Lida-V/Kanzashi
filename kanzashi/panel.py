@@ -204,6 +204,10 @@ class KANZASHI_PT_main(bpy.types.Panel):
                 box.label(text=chk, icon="CHECKMARK" if chk.startswith(("検査 OK", "Check OK")) else "ERROR")
             box.operator("kanzashi.export", text=T(KANZASHI_OT_export._ja[0]), icon="EXPORT")
             box.label(text=T("髪を 1 つにまとめ、この UV だけで FBX に出す"))
+            col = box.column(align=True)
+            col.alert = True
+            col.label(text=T("Tripo では髪に Smart UV を使わない"), icon="ERROR")
+            col.label(text=T("（毛束ごとの UV が作り直されて消えます）"))
             swapped = [h.name for h in det if h.get(SW.SWAP_KEY)]
             col = box.column(align=True)
             if swapped:

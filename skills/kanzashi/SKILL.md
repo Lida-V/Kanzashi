@@ -181,13 +181,15 @@ blender -b model_k3.blend --python <repo>/skills/kanzashi/scripts/hair_penetrati
 
 | 選択 | すること |
 |---|---|
-| テクスチャを作り直す | `--export hair.fbx` を付けて実行。毛束ごとの UV だけを持つ髪が出ます。作り直したテクスチャをどう戻すかは、ユーザーと決めます |
+| テクスチャを作り直す | `--export hair.fbx` を付けて実行。毛束ごとの UV だけを持つ髪が出ます。作り直したテクスチャをどう戻すかは、ユーザーと決めます。**Tripo でテクスチャを作るときは、髪に Smart UV を使わない**（下の注意） |
 | 今の見た目のまま、新しい UV に替える | `--swap` を付けて実行。今のテクスチャを新しい UV へ写します。報告の `swap` に、色が違う三角形の数が出ます |
 | UV だけ足しておく | 何も付けない。UV マップ `LW_StrandUV` が足され、今の描画は変わりません |
 
 ```bash
 blender -b model_k3.blend --python <repo>/scripts/kanzashi_run.py -- --out model_k4.blend --swap --report k4.json
 ```
+
+**注意（必ずユーザーに伝える）：Tripo で髪のテクスチャを作るとき、Smart UV を使わない。** Smart UV は UV を作り直すので、毛束ごとの UV が消えます。書き出した髪を渡すときは、元の UV を保つ設定で行うよう、書き出しの報告と一緒に伝えます。戻ってきたモデルは、UV の島の数と配置が書き出した物と同じかを確かめてから使います。違っていたら、Smart UV が掛かっています。使わずにユーザーへ知らせます。
 
 ### 7. 形の確定
 

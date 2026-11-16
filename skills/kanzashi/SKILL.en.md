@@ -178,13 +178,15 @@ Only the pose of the file is tested. Other poses of the arms and hair against ha
 
 | Choice | What to do |
 |---|---|
-| Make new textures | run with `--export hair.fbx`: the hair with the strand UV only. Decide with the user how the new textures come back |
+| Make new textures | run with `--export hair.fbx`: the hair with the strand UV only. Decide with the user how the new textures come back. **Do not use Smart UV on the hair when texturing in Tripo** (see the note below) |
 | Keep the look, switch to the new UV | run with `--swap`: the current textures are transferred to the new UV. `swap` in the report gives the number of triangles whose colour differs |
 | Just add the UV | no flag: the UV map `LW_StrandUV` is added and rendering is unchanged |
 
 ```bash
 blender -b model_k3.blend --python <repo>/scripts/kanzashi_run.py -- --out model_k4.blend --swap --report k4.json
 ```
+
+**Note (always tell the user): do not use Smart UV on the hair when texturing in Tripo.** Smart UV makes a new UV, so the strand UV is lost. When the exported hair is handed over, say (with the export report) that the original UV must be kept. When the model comes back, check that the number and the layout of the UV islands are those of the export before using it; if they differ, Smart UV was applied: do not use it, and tell the user.
 
 ### 7. Applying the shape
 

@@ -11,6 +11,7 @@ English: the skill now fixes the place in the pipeline (after the head and the h
 - ③ と ④ は、どちらか片方だけが動くようにした。「色を直すモードに入る」を押すと、曲げている最中ならつまみを書き戻して消してから入る（逆向きは前からそうなっていた）。
 - つまみの G（動かす）と R（回す）を、Kanzashi の操作にした（つまみを選んでいる間だけ。ほかの物の G・R は Blender のまま）。動かしている・回している最中も、中ボタンのドラッグとホイールで視点を変えられる。クリックで決定、右クリック・Esc で取り消し、X・Y・Z で軸、Shift でゆっくり。数値の入力はできない。
 - つまみを R で回すと、その点でワイヤーの向きが変わり、毛束が付いてくる。回した点は、曲げ終わった後も向きを保つ（ハンドルを「整列」にして書き戻す）。動かしただけの点は、今までどおり自動でなめらかにする。
+- 注意を足した：Tripo でテクスチャを作るとき、髪に Smart UV を使わない（UV が作り直されて、毛束ごとの UV が消える）。パネルの ⑤、書き出しの後のメッセージ、README、スキルに書いた。
 
 English: steps 3 and 4 are now exclusive (entering the colour mode ends bending); G and R on a handle are Kanzashi's own, so the view can be orbited with the middle button meanwhile; R turns a handle, which changes the direction of the wire there, and the turn is kept after bending ends.
 

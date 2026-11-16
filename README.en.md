@@ -64,7 +64,7 @@ Within the making of a character, do this **after the head and the hair are spli
 3. Where a colour is wrong, press "Start Fixing Colours" in step 3. Click a face of the right colour with the eyedropper, then stroke over the faces to fix with the brush.
 4. To bend a strand, show its handles in step 4 and move them (G key).
 5. Press "Make the Strand UV" in step 5. It takes tens of seconds. The result of the check is shown below the button.
-6. To make new textures, use "Export for Texturing". To keep the current look on the new UV, use "Swap to this UV".
+6. To make new textures, use "Export for Texturing". **When texturing in Tripo, do not use Smart UV on the hair** (it makes a new UV and the strand UV is lost; keep the original UV). To keep the current look on the new UV, use "Swap to this UV".
 
 When you come back to edit more, **do not detect again**; go to step 3. A second detection rebuilds everything, and your repainting and bending are lost.
 

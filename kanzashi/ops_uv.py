@@ -257,4 +257,10 @@ class KANZASHI_OT_export(bpy.types.Operator):
             T("書き出し：%s（%.1f MB、面 %d）%s")
             % (path, mb, info["faces"], T("。150 MB を超えています") if mb > 150 else ""),
         )
+        self.report(
+            {"WARNING"},
+            T(
+                "Tripo でテクスチャを作るとき、髪に Smart UV を使わないでください（毛束ごとの UV が作り直されて消えます）"
+            ),
+        )
         return {"FINISHED"}
