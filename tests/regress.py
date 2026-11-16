@@ -7,6 +7,7 @@ code can be compared on the same file (tests/compare.py). The opened file is nev
 
 Steps: register hair, detect (when not detected yet), repaint some faces, bend one wire, strand UV, check, swap and
 back, export, apply the shape. A step that fails is recorded with its error and the next ones still run."""
+
 import argparse
 import hashlib
 import importlib
@@ -89,7 +90,7 @@ def shown_state(h):
 
 
 def main():
-    argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+    argv = sys.argv[sys.argv.index("--") + 1 :] if "--" in sys.argv else []
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
     a = ap.parse_args(argv)
@@ -144,8 +145,14 @@ def main():
                     ca.data[li].color = rgb
             me.update()
             r = apply_hair(ctx, h)
-            out[h.name] = dict(src=src, dst=dst, result={k: (int(v) if isinstance(v, (int, np.integer)) else str(v)[:60]) for k, v in dict(r or {}).items()},
-                               state=mesh_state(h))
+            out[h.name] = dict(
+                src=src,
+                dst=dst,
+                result={
+                    k: (int(v) if isinstance(v, (int, np.integer)) else str(v)[:60]) for k, v in dict(r or {}).items()
+                },
+                state=mesh_state(h),
+            )
         return out
 
     def s_bend():
@@ -164,11 +171,19 @@ def main():
 
     def s_uv():
         r = op(("kanzashi", "uv"), ("lida", "hs_uv"))("EXEC_DEFAULT")
-        return dict(result=sorted(r), check=sc.get("lida_hs_uvcheck", sc.get("kanzashi_uvcheck", "")), hairs={h.name: mesh_state(h) for h in hairs()})
+        return dict(
+            result=sorted(r),
+            check=sc.get("lida_hs_uvcheck", sc.get("kanzashi_uvcheck", "")),
+            hairs={h.name: mesh_state(h) for h in hairs()},
+        )
 
     def s_check():
         c = find("uv_check")(hairs())
-        return {k: (round(v, 5) if isinstance(v, float) else v) for k, v in c.items() if isinstance(v, (int, float, bool, str))}
+        return {
+            k: (round(v, 5) if isinstance(v, float) else v)
+            for k, v in c.items()
+            if isinstance(v, (int, float, bool, str))
+        }
 
     def s_swap():
         f = op(("kanzashi", "uvswap"), ("lida", "hs_uvswap"))
@@ -187,11 +202,29 @@ def main():
 
     def s_apply():
         r = op(("kanzashi", "finalize"), ("lida", "hs_finalize"))("EXEC_DEFAULT")
-        return dict(result=sorted(r), hairs={h.name: dict(state=mesh_state(h), modifiers=[m.type for m in h.modifiers],
-                                                          attrs=sorted(x.name for x in h.data.attributes if x.name.startswith("lw_"))) for h in hairs()})
+        return dict(
+            result=sorted(r),
+            hairs={
+                h.name: dict(
+                    state=mesh_state(h),
+                    modifiers=[m.type for m in h.modifiers],
+                    attrs=sorted(x.name for x in h.data.attributes if x.name.startswith("lw_")),
+                )
+                for h in hairs()
+            },
+        )
 
-    for name, fn in (("register", s_register), ("detect", s_detect), ("repaint", s_repaint), ("bend", s_bend), ("uv", s_uv),
-                     ("check", s_check), ("swap", s_swap), ("export", s_export), ("apply", s_apply)):
+    for name, fn in (
+        ("register", s_register),
+        ("detect", s_detect),
+        ("repaint", s_repaint),
+        ("bend", s_bend),
+        ("uv", s_uv),
+        ("check", s_check),
+        ("swap", s_swap),
+        ("export", s_export),
+        ("apply", s_apply),
+    ):
         step(name, fn)
     kanzashi.unregister()
     rep["steps"]["unregister"] = "ok"

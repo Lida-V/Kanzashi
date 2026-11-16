@@ -4,6 +4,7 @@
     Kanzashi-addon-<version>.zip    the Blender add-on (install from disk)
     Kanzashi-scripts-<version>.zip  the core modules and the script that runs without the panel
 Run: python tools/build_packages.py"""
+
 import hashlib
 import os
 import zipfile
@@ -15,7 +16,9 @@ FIXED = (2026, 1, 1, 0, 0, 0)
 
 
 def put(z, arc, path):
-    info = zipfile.ZipInfo(arc, FIXED); info.compress_type = zipfile.ZIP_DEFLATED; info.external_attr = 0o644 << 16
+    info = zipfile.ZipInfo(arc, FIXED)
+    info.compress_type = zipfile.ZIP_DEFLATED
+    info.external_attr = 0o644 << 16
     z.writestr(info, open(path, "rb").read())
 
 
@@ -30,12 +33,24 @@ def build(name, entries):
     print(name, os.path.getsize(out), sha)
 
 
-addon = [("kanzashi/" + f, os.path.join(ROOT, "kanzashi", f)) for f in sorted(os.listdir(os.path.join(ROOT, "kanzashi"))) if f.endswith(".py")]
-addon += [("kanzashi/LICENSE", os.path.join(ROOT, "LICENSE")), ("kanzashi/README.md", os.path.join(ROOT, "README.md")), ("kanzashi/README.en.md", os.path.join(ROOT, "README.en.md"))]
+addon = [
+    ("kanzashi/" + f, os.path.join(ROOT, "kanzashi", f))
+    for f in sorted(os.listdir(os.path.join(ROOT, "kanzashi")))
+    if f.endswith(".py")
+]
+addon += [
+    ("kanzashi/LICENSE", os.path.join(ROOT, "LICENSE")),
+    ("kanzashi/README.md", os.path.join(ROOT, "README.md")),
+    ("kanzashi/README.en.md", os.path.join(ROOT, "README.en.md")),
+]
 build("Kanzashi-addon-%s.zip" % VERSION, addon)
 
 top = "Kanzashi-scripts-%s/" % VERSION
 scripts = [(top + "kanzashi_run.py", os.path.join(ROOT, "scripts", "kanzashi_run.py"))]
 scripts += [(top + "kanzashi_core/" + f, os.path.join(ROOT, "kanzashi", f)) for f in CORE]
-scripts += [(top + "LICENSE", os.path.join(ROOT, "LICENSE")), (top + "README.md", os.path.join(ROOT, "README.md")), (top + "README.en.md", os.path.join(ROOT, "README.en.md"))]
+scripts += [
+    (top + "LICENSE", os.path.join(ROOT, "LICENSE")),
+    (top + "README.md", os.path.join(ROOT, "README.md")),
+    (top + "README.en.md", os.path.join(ROOT, "README.en.md")),
+]
 build("Kanzashi-scripts-%s.zip" % VERSION, scripts)

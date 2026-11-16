@@ -2,7 +2,8 @@
 # Copyright (c) 2026 Lida
 """Compares two results of tests/regress.py. Exit code 0 when they are the same.
 
-    python tests/compare.py before.json after.json"""
+python tests/compare.py before.json after.json"""
+
 import json
 import sys
 

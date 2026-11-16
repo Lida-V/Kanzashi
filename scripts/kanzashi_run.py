@@ -8,6 +8,7 @@
 The opened file is never saved; --out must not exist yet. Without --hair, meshes whose name (or whose materials'
 names) say hair are taken. The core modules are looked for next to this file, in ./kanzashi_core, and in
 ../kanzashi (the add-on's folder in the repository)."""
+
 import argparse
 import json
 import os
@@ -37,19 +38,23 @@ def looks_like_hair(ob):
         return False
     if any(w in name for w in WORDS):
         return True
-    slots = {i for i, s in enumerate(ob.material_slots) if s.material and any(w in s.material.name.lower() for w in WORDS)}
+    slots = {
+        i for i, s in enumerate(ob.material_slots) if s.material and any(w in s.material.name.lower() for w in WORDS)
+    }
     if not slots:
         return False
-    mi = np.empty(len(ob.data.polygons), dtype=np.int32); ob.data.polygons.foreach_get("material_index", mi)
+    mi = np.empty(len(ob.data.polygons), dtype=np.int32)
+    ob.data.polygons.foreach_get("material_index", mi)
     return float(np.isin(mi, list(slots)).mean()) >= 0.6
 
 
 def fail(msg, code=1):
-    print("KANZASHI " + json.dumps(dict(ok=False, error=msg), ensure_ascii=False)); sys.exit(code)
+    print("KANZASHI " + json.dumps(dict(ok=False, error=msg), ensure_ascii=False))
+    sys.exit(code)
 
 
 def main():
-    argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+    argv = sys.argv[sys.argv.index("--") + 1 :] if "--" in sys.argv else []
     ap = argparse.ArgumentParser(prog="kanzashi_run.py")
     ap.add_argument("--hair", action="append", default=[], help="name of a hair mesh (repeat); default: found by name")
     ap.add_argument("--out", help="new .blend to save the result to (must not exist)")
@@ -73,40 +78,55 @@ def main():
         hairs = [o for o in view.objects if looks_like_hair(o)]
     if not hairs:
         fail("no hair mesh found; name them with --hair")
-    crown = None                                             # the highest point of the hairs
+    crown = None  # the highest point of the hairs
     for h in hairs:
-        co = np.empty(len(h.data.vertices) * 3, dtype=np.float32); h.data.vertices.foreach_get("co", co)
-        M = np.array(h.matrix_world); w = co.reshape(-1, 3) @ M[:3, :3].T + M[:3, 3]; i = int(np.argmax(w[:, 2]))
+        co = np.empty(len(h.data.vertices) * 3, dtype=np.float32)
+        h.data.vertices.foreach_get("co", co)
+        M = np.array(h.matrix_world)
+        w = co.reshape(-1, 3) @ M[:3, :3].T + M[:3, 3]
+        i = int(np.argmax(w[:, 2]))
         if crown is None or w[i, 2] > crown[2]:
             crown = w[i]
     rep = dict(ok=True, hairs=[], crown=[float(x) for x in crown])
     done = []
     for h in hairs:
-        name = "LS_Wires_" + h.name; h["lw_wires"] = name
+        name = "LS_Wires_" + h.name
+        h["lw_wires"] = name
         wires = R.ensure_wires(name, bpy.context.scene.collection)
         one = dict(name=h.name)
         try:
             st = TR.detect_and_bind(h, wires, tuple(float(x) for x in crown), cap_len=a.cap_len)
-            one["wires"] = int(st["wires"]); one["filled_faces"] = int(TR.fill_strandless(h.data))
+            one["wires"] = int(st["wires"])
+            one["filled_faces"] = int(TR.fill_strandless(h.data))
             one["rest_shift_mm"] = round(TR.rest_shift(h) * 1000, 4)
             if not a.no_uv:
                 uv = TR.strand_uv_auto(h, wires)
-                one["uv"] = dict(islands=uv["strips"], way=uv["way"], folded=uv["folded"], squashed=uv["squashed"], trouble_share=round(uv["share"], 5))
+                one["uv"] = dict(
+                    islands=uv["strips"],
+                    way=uv["way"],
+                    folded=uv["folded"],
+                    squashed=uv["squashed"],
+                    trouble_share=round(uv["share"], 5),
+                )
             done.append(h)
-        except Exception as e:                               # this hair is left out; the others go on
-            one["error"] = repr(e); rep["ok"] = False
+        except Exception as e:  # this hair is left out; the others go on
+            one["error"] = repr(e)
+            rep["ok"] = False
         rep["hairs"].append(one)
     TR.drop_unused_groups()
     if done and not a.no_uv:
         TR.pack_together(done)
-        c = TR.uv_check(done); rep["check"] = c
+        c = TR.uv_check(done)
+        rep["check"] = c
         if a.export:
             if c["ok"]:
                 rep["export"] = TR.export_for_texture(done, os.path.abspath(a.export))
             else:
-                rep["export"] = "skipped: the UV check failed"; rep["ok"] = False
+                rep["export"] = "skipped: the UV check failed"
+                rep["ok"] = False
     if a.out:
-        bpy.ops.wm.save_as_mainfile(filepath=os.path.abspath(a.out), copy=True); rep["saved"] = os.path.abspath(a.out)
+        bpy.ops.wm.save_as_mainfile(filepath=os.path.abspath(a.out), copy=True)
+        rep["saved"] = os.path.abspath(a.out)
     if a.report:
         json.dump(rep, open(a.report, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     print("KANZASHI " + json.dumps(rep, ensure_ascii=True, default=str))
