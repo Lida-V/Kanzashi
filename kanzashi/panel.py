@@ -10,12 +10,15 @@ import numpy as np
 from bpy_extras import view3d_utils
 from mathutils import kdtree
 
+from . import edit as ED
 from . import i18n as LANG
+from . import strand_uv as UV
 from . import strands as S
+from . import swap as SW
 from . import tree as TR
 
 T = LANG.T
-TR.TRANSLATE = T  # the progress texts of the slow steps
+UV.TRANSLATE = T  # the progress texts of the slow steps
 
 R = S.R
 TOOL = "lida.hs_face_tool"
@@ -173,7 +176,7 @@ def sync_list(context, hair=None):
         if not _detected(hair):
             return
         hidden = {int(x) for x in hair.get("lw_hidden", [])}
-        for k, faces, kind in TR.wire_table(hair, _wires(context, hair)):
+        for k, faces, kind in ED.wire_table(hair, _wires(context, hair)):
             it = sc.lida_hs_wires.add()
             it.wire = k
             it.faces = faces
@@ -223,8 +226,8 @@ def enter_paint(context, hair):
     if ca is None:
         return False
     hair.data.color_attributes.active_color = ca
-    if TR.HIDE_GROUP in hair.modifiers:
-        TR.hide_modifier(hair, False)
+    if ED.HIDE_GROUP in hair.modifiers:
+        ED.hide_modifier(hair, False)
     bpy.ops.object.mode_set(mode="VERTEX_PAINT")
     flat_colour_view(context)
     context.scene.lida_hs_hair = hair
@@ -265,7 +268,7 @@ def pick_ray(context, origin, direction):
     if best is None:
         return None, -1
     _d, hair, index = best
-    k = int(TR.face_strands(hair.data)[index])
+    k = int(ED.face_strands(hair.data)[index])
     if k < 0:
         return None, -1
     set_current(context, hair, k)
@@ -410,10 +413,10 @@ def paint_ray(context, hair, origin, direction, radius):
 
 def apply_hair(context, hair):
     """Moves the painted faces to their wires (works in any mode) and refreshes the list."""
-    r = TR.apply_repaint(hair, _wires(context, hair))
+    r = ED.apply_repaint(hair, _wires(context, hair))
     hidden = [int(x) for x in hair.get("lw_hidden", [])]
     if hidden:
-        TR.set_hidden(hair, hidden)
+        ED.set_hidden(hair, hidden)
     _trees.clear()
     sync_list(context, hair)
     return r
@@ -562,10 +565,10 @@ class LIDA_OT_hs_detect(bpy.types.Operator):
             try:
                 st = TR.detect_and_bind(hair, _wires(context, hair), tuple(sc.cursor.location), cap_len=sc.lida_hs_cap)
                 total += st["wires"]
-                TR.fill_strandless(hair.data)
+                UV.fill_strandless(hair.data)
             except Exception as e:
                 failed.append(T("%s：%s") % (hair.name, e))
-        TR.drop_unused_groups()
+        UV.drop_unused_groups()
         only_hair(context, True)
         flat_colour_view(context)
         _trees.clear()
@@ -633,10 +636,10 @@ class LIDA_OT_hs_stroke(bpy.types.Operator):
             if hit is None:
                 self.report({"WARNING"}, T("髪の面に当たりませんでした"))
                 return {"CANCELLED"}
-            k2 = int(TR.face_strands(hair.data)[hit[1]])
+            k2 = int(ED.face_strands(hair.data)[hit[1]])
             keep = {k2} | ({cur} if cur >= 0 else set())
             nw = len(_wires(context, hair).data.splines)
-            TR.set_hidden(hair, [k for k in range(nw) if k not in keep])
+            ED.set_hidden(hair, [k for k in range(nw) if k not in keep])
             _trees.clear()
             sync_list(context, hair)
             sc.lida_hs_mode = "PAINT" if cur >= 0 else "PICK"
@@ -720,7 +723,7 @@ class LIDA_OT_hs_eye(bpy.types.Operator):
             hidden.discard(self.wire)
         else:
             hidden.add(self.wire)
-        TR.set_hidden(hair, sorted(hidden))
+        ED.set_hidden(hair, sorted(hidden))
         _trees.clear()
         sync_list(context, hair)
         if bending(context):
@@ -740,7 +743,7 @@ class LIDA_OT_hs_solo(bpy.types.Operator):
         if not _detected(hair):
             return {"CANCELLED"}
         n = len(_wires(context, hair).data.splines)
-        TR.set_hidden(hair, [k for k in range(n) if k != self.wire])
+        ED.set_hidden(hair, [k for k in range(n) if k != self.wire])
         _trees.clear()
         sync_list(context, hair)
         if bending(context):
@@ -761,7 +764,7 @@ class LIDA_OT_hs_new(bpy.types.Operator):
         if not _detected(hair):
             self.report({"ERROR"}, T("先に ② の検出を実行してください"))
             return {"CANCELLED"}
-        k = TR.new_wire(hair, _wires(context, hair))
+        k = ED.new_wire(hair, _wires(context, hair))
         sync_list(context, hair)
         set_current(context, hair, k)
         context.scene.lida_hs_mode = "PAINT"
@@ -805,8 +808,8 @@ def end_bend(context):
                 bp.handle_left_type = bp.handle_right_type = "AUTO"
         w.data.update_tag()
         w.hide_select = False
-        if TR.HIDE_GROUP in hair.modifiers and not sc.get("lida_hs_bend_switch"):
-            TR.hide_modifier(hair, False)
+        if ED.HIDE_GROUP in hair.modifiers and not sc.get("lida_hs_bend_switch"):
+            ED.hide_modifier(hair, False)
         hair.hide_select = bool(sc.get("lida_hs_bend_sel", 0))
     for g in grips:
         bpy.data.objects.remove(g, do_unlink=True)
@@ -824,8 +827,8 @@ def start_bend(context, hair, k):
     finally:
         sc["lida_hs_bend_switch"] = 0
     for h in registered(context):  # only the hair being bent leaves its hidden colours out
-        if h != hair and TR.HIDE_GROUP in h.modifiers:
-            TR.hide_modifier(h, False)
+        if h != hair and ED.HIDE_GROUP in h.modifiers:
+            ED.hide_modifier(h, False)
     w = _wires(context, hair)
     if not (0 <= k < len(w.data.splines)):
         return 0
@@ -864,8 +867,8 @@ def start_bend(context, hair, k):
     )
     sc["lida_hs_bend_keep"] = 1
     hair.hide_select = True
-    TR.set_hidden(hair, [int(x) for x in hair.get("lw_hidden", [])])
-    TR.hide_modifier(hair, True)
+    ED.set_hidden(hair, [int(x) for x in hair.get("lw_hidden", [])])
+    ED.hide_modifier(hair, True)
     w.hide_select = True
     for area in context.screen.areas if context.screen else []:  # the dotted lines from the grips are only noise
         if area.type == "VIEW_3D" and area.spaces.active.overlay.show_relationship_lines:
@@ -916,7 +919,7 @@ class LIDA_OT_hs_bend(bpy.types.Operator):
             return {"CANCELLED"}
         k = int(hair.get("lw_current", -1))
         if k < 0:
-            k = int(np.argmax([f for _k, f, _kind in TR.wire_table(hair, _wires(context, hair))]))
+            k = int(np.argmax([f for _k, f, _kind in ED.wire_table(hair, _wires(context, hair))]))
             set_current(context, hair, k)
         made = start_bend(context, hair, k)
         flat_colour_view(context)
@@ -987,7 +990,7 @@ class LIDA_OT_hs_escape(bpy.types.Operator):
             hidden = bool(hair is not None and len(hair.get("lw_hidden", [])))
             if sc.lida_hs_mode != "PICK" or hidden:  # first: back to the plain state (eyedropper, all shown)
                 if hidden:
-                    TR.set_hidden(hair, [])
+                    ED.set_hidden(hair, [])
                     _trees.clear()
                     sync_list(context, hair)
                 sc.lida_hs_mode = "PICK"
@@ -1032,9 +1035,9 @@ def leave_modes(context):
     for h in registered(context):
         h.hide_select = False
         if _detected(h):
-            TR.set_hidden(h, [])
-            if TR.HIDE_GROUP in h.modifiers:
-                TR.hide_modifier(h, False)
+            ED.set_hidden(h, [])
+            if ED.HIDE_GROUP in h.modifiers:
+                ED.hide_modifier(h, False)
     _trees.clear()
 
 
@@ -1075,7 +1078,7 @@ class LIDA_OT_hs_finalize(bpy.types.Operator):
             if not _detected(h):
                 continue
             try:
-                r = TR.finalize(h, bpy.data.objects.get(h.get("lw_wires", "")))
+                r = ED.finalize(h, bpy.data.objects.get(h.get("lw_wires", "")))
                 done.append(T("%s（最大 %.1f mm）") % (h.name, r["moved_mm"]))
             except Exception as e:
                 failed.append(T("%s：%s") % (h.name, e))
@@ -1084,7 +1087,7 @@ class LIDA_OT_hs_finalize(bpy.types.Operator):
         if failed:
             self.report({"ERROR"}, T("確定できなかった物：") + " / ".join(failed))
         self.report({"INFO"}, T("確定しました：") + (T("、").join(done) if done else T("なし")))
-        TR.drop_unused_groups()
+        UV.drop_unused_groups()
         return {"FINISHED"}
 
 
@@ -1139,11 +1142,11 @@ class _BusyOp:
                 except Exception:
                     pass
 
-        TR.PROGRESS = tell
+        UV.PROGRESS = tell
         try:
             return self.work(context)
         finally:
-            TR.PROGRESS = None
+            UV.PROGRESS = None
             wm.progress_end()
             sc["lida_hs_busy"] = ""
             context.window.cursor_modal_restore()
@@ -1191,12 +1194,12 @@ class LIDA_OT_hs_uv(_BusyOp, bpy.types.Operator):
         back_on = context.scene.lida_hs_on
         if bending(context) or back_on:
             leave_modes(context)
-        made = [TR.strand_uv_auto(h, _wires(context, h)) for h in hs]
+        made = [UV.strand_uv_auto(h, _wires(context, h)) for h in hs]
         n = sum(r["strips"] for r in made)
         context.scene["lida_hs_uvways"] = T("、").join(T("%s＝%s") % (h.name, r["way"]) for h, r in zip(hs, made))
-        TR.pack_together(hs)  # one 0-1 square for all the hairs (one texture)
-        TR._tell(T("UV を検査中"), 0.85)
-        c = TR.uv_check(hs)
+        UV.pack_together(hs)  # one 0-1 square for all the hairs (one texture)
+        UV._tell(T("UV を検査中"), 0.85)
+        c = UV.uv_check(hs)
         context.scene["lida_hs_uvcheck"] = _check_text(c)
         self.report({"INFO"}, T("島 %d 個（UV マップ LW_StrandUV。元の UV はそのまま）。%s") % (n, _check_text(c)))
         return {"FINISHED"}
@@ -1238,19 +1241,19 @@ class LIDA_OT_hs_uvswap(_BusyOp, bpy.types.Operator):
         if bending(context) or context.scene.lida_hs_on:
             leave_modes(context)
         if not self.on:
-            n_ = TR.revert_uv(hs)
+            n_ = SW.revert_uv(hs)
             self.report({"INFO"}, T("元の UV・材質に戻しました（髪 %d 個）") % n_)
             return {"FINISHED"}
         if not hs:
             self.report({"ERROR"}, T("先に「毛束ごとの UV を作る」を押してください"))
             return {"CANCELLED"}
-        TR._tell(T("UV を検査中"), 0.85)
-        c = TR.uv_check(hs)
+        UV._tell(T("UV を検査中"), 0.85)
+        c = UV.uv_check(hs)
         context.scene["lida_hs_uvcheck"] = _check_text(c)
         if not c["ok"]:
             self.report({"ERROR"}, _check_text(c) + T("。「毛束ごとの UV を作る」を押し直してください"))
             return {"CANCELLED"}
-        r = TR.swap_uv(hs)
+        r = SW.swap_uv(hs)
         msg = T("張り替えました：髪 %d 個、写した画像 %d 枚、材質の写し %d 個") % (
             r["hairs"],
             r["images"],
@@ -1282,7 +1285,7 @@ class LIDA_OT_hs_uvdrop(bpy.types.Operator):
         return context.window_manager.invoke_confirm(self, event)
 
     def execute(self, context):
-        gone = TR.drop_old_uv(registered(context))
+        gone = SW.drop_old_uv(registered(context))
         self.report(
             {"INFO"}, T("消した UV：%s") % (T("、").join(gone) if gone else T("なし（張り替え済みの髪がありません）"))
         )
@@ -1319,8 +1322,8 @@ class LIDA_OT_hs_export(bpy.types.Operator):
             return {"CANCELLED"}
         if bending(context) or context.scene.lida_hs_on:
             leave_modes(context)
-        TR._tell(T("UV を検査中"), 0.85)
-        c = TR.uv_check(hs)
+        UV._tell(T("UV を検査中"), 0.85)
+        c = UV.uv_check(hs)
         context.scene["lida_hs_uvcheck"] = _check_text(c)
         if not c["ok"]:
             self.report({"ERROR"}, _check_text(c) + T("。「毛束ごとの UV を作る」を押し直してください"))
@@ -1328,7 +1331,7 @@ class LIDA_OT_hs_export(bpy.types.Operator):
         path = bpy.path.abspath(self.filepath)
         if not path.lower().endswith((".fbx", ".glb")):
             path += ".fbx"
-        info = TR.export_for_texture(hs, path)
+        info = SW.export_for_texture(hs, path)
         mb = info["bytes"] / 1048576.0
         self.report(
             {"WARNING"} if mb > 150 else {"INFO"},
@@ -1497,7 +1500,7 @@ class LIDA_PT_hs(bpy.types.Panel):
                 box.label(text=chk, icon="CHECKMARK" if chk.startswith(("検査 OK", "Check OK")) else "ERROR")
             box.operator("lida.hs_export", text=T(LIDA_OT_hs_export._ja[0]), icon="EXPORT")
             box.label(text=T("髪を 1 つにまとめ、この UV だけで FBX に出す"))
-            swapped = [h.name for h in det if h.get(TR.SWAP_KEY)]
+            swapped = [h.name for h in det if h.get(SW.SWAP_KEY)]
             col = box.column(align=True)
             if swapped:
                 col.label(text=T("張り替え済み：%s") % T("、").join(swapped), icon="CHECKMARK")
@@ -1516,7 +1519,7 @@ class LIDA_PT_hs(bpy.types.Panel):
         box.label(text=T("⑥ 終わる"), icon="CHECKMARK")
         box.operator("lida.hs_quit", text=T(LIDA_OT_hs_quit._ja[0]), icon="PAUSE")
         box.label(text=T("表示を元に戻す。後で続きができます"))
-        if any(h.get(TR.SWAP_KEY) for h in det):
+        if any(h.get(SW.SWAP_KEY) for h in det):
             sub = box.column()
             sub.alert = True
             sub.operator("lida.hs_uvdrop", text=T(LIDA_OT_hs_uvdrop._ja[0]), icon="TRASH")

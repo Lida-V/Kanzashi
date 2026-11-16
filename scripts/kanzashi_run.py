@@ -6,8 +6,7 @@
     blender -b model.blend --python kanzashi_run.py -- --hair Hair --hair Bangs --out out.blend --export hair.fbx --report r.json
 
 The opened file is never saved; --out must not exist yet. Without --hair, meshes whose name (or whose materials'
-names) say hair are taken. The core modules are looked for next to this file, in ./kanzashi_core, and in
-../kanzashi (the add-on's folder in the repository)."""
+names) say hair are taken. The package "kanzashi" is looked for next to this file and one folder up (the repository)."""
 
 import argparse
 import json
@@ -18,14 +17,15 @@ import bpy
 import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-for cand in (HERE, os.path.join(HERE, "kanzashi_core"), os.path.join(HERE, "..", "kanzashi")):
-    if os.path.isfile(os.path.join(cand, "lida_hair_tree.py")):
+for cand in (HERE, os.path.join(HERE, "..")):
+    if os.path.isfile(os.path.join(cand, "kanzashi", "tree.py")):
         sys.path.insert(0, os.path.abspath(cand))
         break
-import lida_hair_strands as S  # noqa: E402
-import lida_hair_tree as TR  # noqa: E402
+from kanzashi import rewire as R  # noqa: E402
+from kanzashi import strand_uv as UV  # noqa: E402
+from kanzashi import swap as SW  # noqa: E402
+from kanzashi import tree as TR  # noqa: E402
 
-R = S.R
 WORDS = ("hair", "bangs", "braid", "ponytail", "sidelock", "ahoge", "髪", "前髪", "毛")
 NOT_WORDS = ("flower", "acc_", "pin", "ribbon", "tiara", "outline", "hairband", "chain", "飾")
 
@@ -97,10 +97,10 @@ def main():
         try:
             st = TR.detect_and_bind(h, wires, tuple(float(x) for x in crown), cap_len=a.cap_len)
             one["wires"] = int(st["wires"])
-            one["filled_faces"] = int(TR.fill_strandless(h.data))
+            one["filled_faces"] = int(UV.fill_strandless(h.data))
             one["rest_shift_mm"] = round(TR.rest_shift(h) * 1000, 4)
             if not a.no_uv:
-                uv = TR.strand_uv_auto(h, wires)
+                uv = UV.strand_uv_auto(h, wires)
                 one["uv"] = dict(
                     islands=uv["strips"],
                     way=uv["way"],
@@ -113,14 +113,14 @@ def main():
             one["error"] = repr(e)
             rep["ok"] = False
         rep["hairs"].append(one)
-    TR.drop_unused_groups()
+    UV.drop_unused_groups()
     if done and not a.no_uv:
-        TR.pack_together(done)
-        c = TR.uv_check(done)
+        UV.pack_together(done)
+        c = UV.uv_check(done)
         rep["check"] = c
         if a.export:
             if c["ok"]:
-                rep["export"] = TR.export_for_texture(done, os.path.abspath(a.export))
+                rep["export"] = SW.export_for_texture(done, os.path.abspath(a.export))
             else:
                 rep["export"] = "skipped: the UV check failed"
                 rep["ok"] = False
