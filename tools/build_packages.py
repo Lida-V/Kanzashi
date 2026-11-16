@@ -53,5 +53,5 @@ def check_versions():
 check_versions()
 build("Kanzashi-addon-%s.zip" % VERSION, package("") + [("kanzashi/" + d, os.path.join(ROOT, d)) for d in DOCS])
 top = "Kanzashi-scripts-%s/" % VERSION
-scripts = [(top + "kanzashi_run.py", os.path.join(ROOT, "scripts", "kanzashi_run.py"))]
+scripts = [(top + n, os.path.join(ROOT, "scripts", n)) for n in ("kanzashi_run.py", "kanzashi_guard.py")]
 build("Kanzashi-scripts-%s.zip" % VERSION, scripts + package(top) + [(top + d, os.path.join(ROOT, d)) for d in DOCS])

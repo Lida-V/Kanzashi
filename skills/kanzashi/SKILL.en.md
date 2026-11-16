@@ -35,6 +35,11 @@ Do not use it when the hair is already separate strand parts, when it is made of
 - Do not call it done on numbers alone. Whether the split is good is decided by the user looking at the pictures.
 - Painting strand colours is done by the user in Blender. The agent does not paint for them (which face belongs to which strand is a visual judgement).
 - Bending wires is the user's work too, as a rule. The agent moves wires only to fix strands inside the body, after stating its plan and being told "fix them by the AI's plan", and has the result confirmed with pictures (step 5).
+- **Do not split, join or unwrap again a hair that has the strand UV, with any other tool or skill.** Splitting into parts, separating by material or by loose parts, joining, Smart UV or a new unwrap all break the strand UV. Kanzashi marks a hair whose UV it made (the object property `kanzashi_uv_lock`). Before and after another step touches the hair, run the check below. With exit code 1 (`split`, `changed` = vertices or faces differ, `uv_changed`, `uv_missing`) do not use the result; tell the user. If the hair must be split into parts, do it before Kanzashi (the place in the pipeline). If a marked hair really has to be split, ask the user, and make the strand UV again afterwards.
+
+```bash
+blender -b model.blend --python <repo>/scripts/kanzashi_guard.py -- --report guard.json
+```
 
 ## The steps, and where to ask the user
 

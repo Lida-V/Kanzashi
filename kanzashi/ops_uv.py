@@ -4,6 +4,7 @@
 
 import bpy
 
+from . import guard as GD
 from . import strand_uv as UV
 from . import swap as SW
 from .common import T, _detected, _wires, bending, registered
@@ -117,6 +118,7 @@ class KANZASHI_OT_uv(_BusyOp, bpy.types.Operator):
         n = sum(r["strips"] for r in made)
         context.scene["lida_hs_uvways"] = T("、").join(T("%s＝%s") % (h.name, r["way"]) for h, r in zip(hs, made))
         UV.pack_together(hs)  # one 0-1 square for all the hairs (one texture)
+        GD.mark(hs)  # so that a later split or unwrap of the hair can be noticed
         UV._tell(T("UV を検査中"), 0.85)
         c = UV.uv_check(hs)
         context.scene["lida_hs_uvcheck"] = _check_text(c)

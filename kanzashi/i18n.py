@@ -245,6 +245,8 @@ EN = {
     "作った UV を選ぶ": "Strand UV",
     "元の UV に戻す": "Original UV",
     "髪を 1 つにまとめ、この UV だけで FBX に出す": "One mesh, this UV only, as FBX",
+    "UV を作った後に変わった髪：%s": "Changed after the UV was made: %s",
+    "分割・結合・UV の作り直しで崩れています。UV を作り直してください": "Split, joined or unwrapped again: make the UV again",
     "Tripo では髪に Smart UV を使わない": "No Smart UV on the hair in Tripo",
     "（毛束ごとの UV が作り直されて消えます）": "(it replaces the strand UV)",
     "Tripo でテクスチャを作るとき、髪に Smart UV を使わないでください（毛束ごとの UV が作り直されて消えます）": "When texturing in Tripo, do not use Smart UV on the hair (it makes a new UV and the strand UV is lost)",

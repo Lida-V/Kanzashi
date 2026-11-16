@@ -12,8 +12,9 @@ English: the skill now fixes the place in the pipeline (after the head and the h
 - つまみの G（動かす）と R（回す）を、Kanzashi の操作にした（つまみを選んでいる間だけ。ほかの物の G・R は Blender のまま）。動かしている・回している最中も、中ボタンのドラッグとホイールで視点を変えられる。クリックで決定、右クリック・Esc で取り消し、X・Y・Z で軸、Shift でゆっくり。数値の入力はできない。
 - つまみを R で回すと、その点でワイヤーの向きが変わり、毛束が付いてくる。回した点は、曲げ終わった後も向きを保つ（ハンドルを「整列」にして書き戻す）。動かしただけの点は、今までどおり自動でなめらかにする。
 - 注意を足した：Tripo でテクスチャを作るとき、髪に Smart UV を使わない（UV が作り直されて、毛束ごとの UV が消える）。パネルの ⑤、書き出しの後のメッセージ、README、スキルに書いた。
+- 毛束ごとの UV を作った髪に印（`kanzashi_uv_lock`）を付けるようにした。`scripts/kanzashi_guard.py` が、その髪が後から分割・結合・UV の作り直しをされていないかを調べる（終了コード 1 で知らせる）。パネルの ⑤ にも、UV を作った後に頂点・面が変わった髪を赤く出す。スキルに「UV を作った髪を、ほかの道具・スキルで分割・展開し直さない。触る前と後に検査する」を決まりとして足した。
 
-English: steps 3 and 4 are now exclusive (entering the colour mode ends bending); G and R on a handle are Kanzashi's own, so the view can be orbited with the middle button meanwhile; R turns a handle, which changes the direction of the wire there, and the turn is kept after bending ends.
+English: a hair that got the strand UV is marked, and `scripts/kanzashi_guard.py` tells when it was later split, joined or unwrapped again; steps 3 and 4 are now exclusive (entering the colour mode ends bending); G and R on a handle are Kanzashi's own, so the view can be orbited with the middle button meanwhile; R turns a handle, which changes the direction of the wire there, and the turn is kept after bending ends.
 
 ## 0.4.0（試作）
 

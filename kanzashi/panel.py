@@ -6,6 +6,7 @@ painting, 4 bend by wires, 5 the strand UV, 6 finish."""
 
 import bpy
 
+from . import guard as GD
 from . import i18n as LANG
 from . import swap as SW
 from .common import TOOL, T, _current, _detected, _draw_cursor, _picked_to_add, _row_picked, registered
@@ -193,6 +194,12 @@ class KANZASHI_PT_main(bpy.types.Panel):
         box.operator("kanzashi.uv", text=T(KANZASHI_OT_uv._ja[0]))
         box.label(text=T("数十秒かかります（進み具合が上に出ます）"))
         have = [h.name for h in det if "LW_StrandUV" in h.data.uv_layers]
+        broken = [h.name for h in det if GD.quick(h)]
+        if broken:
+            col = box.column(align=True)
+            col.alert = True
+            col.label(text=T("UV を作った後に変わった髪：%s") % T("、").join(broken), icon="ERROR")
+            col.label(text=T("分割・結合・UV の作り直しで崩れています。UV を作り直してください"))
         if have:
             box.label(text=T("作成済み：%s") % T("、").join(have), icon="CHECKMARK")
             box.label(text=T("UV マップ名は LW_StrandUV（元の UV はそのまま）"))

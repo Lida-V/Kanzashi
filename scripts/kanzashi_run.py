@@ -24,6 +24,7 @@ for cand in (HERE, os.path.join(HERE, "..")):
         sys.path.insert(0, os.path.abspath(cand))
         break
 from kanzashi import edit as ED  # noqa: E402
+from kanzashi import guard as GD  # noqa: E402
 from kanzashi import rewire as R  # noqa: E402
 from kanzashi import strand_uv as UV  # noqa: E402
 from kanzashi import swap as SW  # noqa: E402
@@ -146,6 +147,7 @@ def main():
     UV.drop_unused_groups()
     if done and not a.no_uv:
         UV.pack_together(done)
+        GD.mark(done)
         c = UV.uv_check(done)
         rep["check"] = c
         if not c["ok"]:

@@ -145,7 +145,7 @@ kanzashi/            the add-on
   strands.py rewire.py wire.py   the layer below detection and wires
   blender_manifest.toml          the definition as an extension
 skills/kanzashi/     the skill for agents (SKILL.md in Japanese, SKILL.en.md in English) and its script that finds and fixes buried strands
-scripts/             kanzashi_run.py (no panel), kanzashi_preview.py (pictures for checking), kanzashi_panel.py (panel without installing)
+scripts/             kanzashi_run.py (no panel), kanzashi_preview.py (pictures for checking), kanzashi_guard.py (was a hair with the strand UV split or unwrapped again?), kanzashi_panel.py (panel without installing)
 tools/               makes the ZIP packages; installs the add-on or tells whether it is installed; checks the English texts
 tests/               compares the results before and after a change of the code
 docs/                figure

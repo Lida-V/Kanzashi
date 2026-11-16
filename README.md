@@ -145,7 +145,7 @@ kanzashi/            アドオン
   strands.py rewire.py wire.py   検出とワイヤーの下の層
   blender_manifest.toml          拡張機能としての定義
 skills/kanzashi/     エージェント向けのスキル（SKILL.md、英語は SKILL.en.md）と、貫通を調べる・直すスクリプト
-scripts/             パネルなしで動かす kanzashi_run.py、確認用の画像を出す kanzashi_preview.py、入れずにパネルを出す kanzashi_panel.py
+scripts/             パネルなしで動かす kanzashi_run.py、確認用の画像を出す kanzashi_preview.py、UV を作った髪が分割・作り直しされていないかを調べる kanzashi_guard.py、入れずにパネルを出す kanzashi_panel.py
 tools/               配布用の ZIP を作る、アドオンを入れる・入っているかを調べる、英語の文の抜けを調べる
 tests/               整理の前後で結果が変わらないかを比べるテスト
 docs/                図
