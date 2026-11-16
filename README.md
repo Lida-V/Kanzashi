@@ -7,7 +7,7 @@ Tripo などの 3D 生成サービスで作った、ひとかたまりの髪を�
 
 **Kanzashi — hair strand tool for Blender**: splits an AI-generated hair mesh into strands, lets you fix the split by painting, bends each strand by a wire, and makes a UV map per strand (check, export for texturing, swap).
 
-- 版：0.3.0（試作）。非公開のリポジトリです。
+- 版：0.4.0（試作）。非公開のリポジトリです。
 - 確かめた環境：Blender 5.3.0、Windows 11。ほかの版では試していません。
 - 作者：Lida
 - パネルの言語：日本語と英語（下の「言語」）
@@ -27,7 +27,7 @@ Tripo などの 3D 生成サービスで作った、ひとかたまりの髪を�
 
 ## 入れ方（アドオン）
 
-1. `Kanzashi-addon-0.3.0.zip` を用意します（`python tools/build_packages.py` で `dist/` に出来ます）。
+1. `Kanzashi-addon-0.4.0.zip` を用意します（`python tools/build_packages.py` で `dist/` に出来ます）。
 2. Blender の「編集 > プリファレンス > アドオン」の右上のメニューから「ディスクからインストール」を選び、ZIP を指定します（拡張機能として入ります）。
 3. 「Kanzashi」を有効にします。
 4. 3D ビューでサイドバー（N キー）を開くと、「Kanzashi」のタブがあります。
@@ -37,6 +37,16 @@ Tripo などの 3D 生成サービスで作った、ひとかたまりの髪を�
 ```bash
 blender model.blend --python scripts/kanzashi_panel.py
 ```
+
+## エージェントから使う（スキル）
+
+AI エージェントにこのリポジトリを読ませると、[AGENTS.md](AGENTS.md) から [skills/kanzashi/SKILL.md](skills/kanzashi/SKILL.md) へ進み、髪の調整を次のように進めます。
+
+1. アドオンが入っているかを調べ、入っていなければ、入れてよいかをユーザーに聞く（`tools/install_addon.py`）。
+2. パネルなしで毛束の検出と UV を行い、新しいファイルに保存する（`scripts/kanzashi_run.py`）。
+3. 毛束ごとの色の画像を作って、分かれ方をユーザーに見てもらう（`scripts/kanzashi_preview.py`）。
+4. 直す所があれば、ユーザーが Blender のパネルで塗る・曲げる。エージェントは、保存されたファイルの続きから UV を作り直す。
+5. UV の使い道（書き出し／張り替え／足すだけ）と、形の確定を、ユーザーに確認してから行う。
 
 ## 言語
 
@@ -70,7 +80,7 @@ blender model.blend --python scripts/kanzashi_panel.py
 
 ## パネルなしで動かす（スクリプト）
 
-`Kanzashi-scripts-0.3.0.zip` を展開して、背景実行で使います。開いたファイルは保存しません。出力先がすでにあると止まります。
+`Kanzashi-scripts-0.4.0.zip` を展開して、背景実行で使います。開いたファイルは保存しません。出力先がすでにあると止まります。
 
 ```bash
 blender -b model.blend --python kanzashi_run.py -- --out model_kanzashi.blend --export hair.fbx --report report.json
@@ -84,8 +94,17 @@ blender -b model.blend --python kanzashi_run.py -- --out model_kanzashi.blend --
 | `--report` | 結果の JSON |
 | `--cap-len` | これより長い輪を「溶け合った所」と見なす長さ（m、既定 0.40） |
 | `--no-uv` | 毛束に分けるだけ |
+| `--swap` | 今のテクスチャを新しい UV へ写して、髪を毛束ごとの UV で描く |
+| `--apply` | 曲げた形をメッシュに書き込み、ワイヤーを外す |
+| `--redetect` | 検出済みの髪でも検出をやり直す（塗り直しと曲げは消えます） |
 
-塗って直す・曲げる・張り替えるは、パネル（アドオン）の側の機能です。
+検出済みの髪（パネルで塗り直した・曲げた髪を含む）を渡すと、毛束はそのまま残して UV だけを作り直します。塗って直す・曲げるは、パネル（アドオン）の側の機能です。
+
+毛束ごとの色の画像（前・後ろ・左・右と UV）は、次で作れます。
+
+```bash
+blender -b model_kanzashi.blend --python kanzashi_preview.py -- --out-dir preview
+```
 
 ## 検査で見ている物
 
@@ -122,8 +141,9 @@ kanzashi/            アドオン
   swap.py            張り替えと書き出し
   strands.py rewire.py wire.py   検出とワイヤーの下の層
   blender_manifest.toml          拡張機能としての定義
-scripts/             パネルなしで動かすスクリプト（kanzashi_run.py）、入れずにパネルを出すスクリプト（kanzashi_panel.py）
-tools/               配布用の ZIP を作るスクリプト、英語の文の抜けを調べるスクリプト
+skills/kanzashi/     エージェント向けのスキル（SKILL.md、英語は SKILL.en.md）
+scripts/             パネルなしで動かす kanzashi_run.py、確認用の画像を出す kanzashi_preview.py、入れずにパネルを出す kanzashi_panel.py
+tools/               配布用の ZIP を作る、アドオンを入れる・入っているかを調べる、英語の文の抜けを調べる
 tests/               整理の前後で結果が変わらないかを比べるテスト
 docs/                図
 ```

@@ -5,7 +5,7 @@
 A Blender tool that splits a generated hair mesh into strands, lets you fix the split by painting, bends each strand by a wire, and makes a UV map with one island per strand.
 It is made for hair that comes out of 3D generation services such as Tripo as one fused lump.
 
-- Version: 0.3.0 (prototype). This repository is private.
+- Version: 0.4.0 (prototype). This repository is private.
 - Tested with: Blender 5.3.0 on Windows 11. Other versions are untested.
 - Author: Lida
 - Panel languages: Japanese and English (see "Language" below).
@@ -25,7 +25,7 @@ It is made for hair that comes out of 3D generation services such as Tripo as on
 
 ## Install (add-on)
 
-1. Get `Kanzashi-addon-0.3.0.zip` (`python tools/build_packages.py` makes it in `dist/`).
+1. Get `Kanzashi-addon-0.4.0.zip` (`python tools/build_packages.py` makes it in `dist/`).
 2. In Blender, open Edit > Preferences > Add-ons, choose "Install from Disk" in the menu at the top right, and pick the ZIP (it is installed as an extension).
 3. Enable "Kanzashi".
 4. Open the sidebar of the 3D viewport (N key). There is a "Kanzashi" tab.
@@ -35,6 +35,16 @@ To try it without installing, start Blender like this; the panel is there for th
 ```bash
 blender model.blend --python scripts/kanzashi_panel.py
 ```
+
+## Use by an agent (skill)
+
+When an AI agent reads this repository, [AGENTS.md](AGENTS.md) leads it to [skills/kanzashi/SKILL.en.md](skills/kanzashi/SKILL.en.md), and it handles the hair like this:
+
+1. Checks whether the add-on is installed and, if not, asks the user whether it may install it (`tools/install_addon.py`).
+2. Detects the strands and makes the UV without the panel, saving to a new file (`scripts/kanzashi_run.py`).
+3. Makes pictures in strand colours and lets the user judge the split (`scripts/kanzashi_preview.py`).
+4. Where something needs fixing, the user paints and bends in the Blender panel; the agent goes on from the saved file and makes the UV again.
+5. Asks the user before deciding what the UV is for (export / swap / just add) and before applying the shape.
 
 ## Language
 
@@ -70,7 +80,7 @@ The brush paints whole faces, so the size of the faces is the finest detail you 
 
 ## Without the panel (script)
 
-Unpack `Kanzashi-scripts-0.3.0.zip` and run it in the background. The opened file is not saved. It stops if the output already exists.
+Unpack `Kanzashi-scripts-0.4.0.zip` and run it in the background. The opened file is not saved. It stops if the output already exists.
 
 ```bash
 blender -b model.blend --python kanzashi_run.py -- --out model_kanzashi.blend --export hair.fbx --report report.json
@@ -84,8 +94,17 @@ blender -b model.blend --python kanzashi_run.py -- --out model_kanzashi.blend --
 | `--report` | JSON report |
 | `--cap-len` | Rings longer than this are treated as "fused" (m, default 0.40) |
 | `--no-uv` | Only split into strands |
+| `--swap` | Transfers the current textures to the new UV and draws the hair with the strand UV |
+| `--apply` | Writes the bent shape into the mesh and removes the wires |
+| `--redetect` | Detects again even on detected hair (repainting and bending are lost) |
 
-Repainting, bending and swapping are functions of the panel (the add-on).
+Given a hair that is already detected (also one repainted or bent in the panel), the strands are kept and only the UV is made again. Repainting and bending are functions of the panel (the add-on).
+
+Pictures in strand colours (front, back, left, right, and the UV):
+
+```bash
+blender -b model_kanzashi.blend --python kanzashi_preview.py -- --out-dir preview
+```
 
 ## What the check looks at
 
@@ -122,8 +141,9 @@ kanzashi/            the add-on
   swap.py            the swap and the export
   strands.py rewire.py wire.py   the layer below detection and wires
   blender_manifest.toml          the definition as an extension
-scripts/             the script that runs without the panel (kanzashi_run.py); the panel without installing (kanzashi_panel.py)
-tools/               makes the ZIP packages; checks that every panel text has an English one
+skills/kanzashi/     the skill for agents (SKILL.md in Japanese, SKILL.en.md in English)
+scripts/             kanzashi_run.py (no panel), kanzashi_preview.py (pictures for checking), kanzashi_panel.py (panel without installing)
+tools/               makes the ZIP packages; installs the add-on or tells whether it is installed; checks the English texts
 tests/               compares the results before and after a change of the code
 docs/                figure
 ```

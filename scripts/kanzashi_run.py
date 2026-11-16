@@ -1,12 +1,14 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (c) 2026 Lida
-"""Kanzashi without the panel: strands -> UV per strand -> check -> (export) -> saved as a NEW file.
+"""Kanzashi without the panel: strands -> UV per strand -> check -> (swap, export, apply) -> saved as a NEW file.
 
-    blender -b model.blend --python kanzashi_run.py -- --out model_kanzashi.blend
-    blender -b model.blend --python kanzashi_run.py -- --hair Hair --hair Bangs --out out.blend --export hair.fbx --report r.json
+    blender -b model.blend --python kanzashi_run.py -- --out model_kanzashi.blend --report r.json
+    blender -b edited.blend --python kanzashi_run.py -- --out final.blend --swap --export hair.fbx --report r2.json
 
-The opened file is never saved; --out must not exist yet. Without --hair, meshes whose name (or whose materials'
-names) say hair are taken. The package "kanzashi" is looked for next to this file and one folder up (the repository)."""
+The opened file is never saved; --out, --export and --report must not exist yet. Without --hair, meshes whose name
+(or whose materials' names) say hair are taken. A hair that already has strands (detected before, maybe repainted
+and bent by hand) keeps them: only the UV is made again. --redetect throws those edits away and detects again.
+The package "kanzashi" is looked for next to this file and one folder up (the repository)."""
 
 import argparse
 import json
@@ -21,6 +23,7 @@ for cand in (HERE, os.path.join(HERE, "..")):
     if os.path.isfile(os.path.join(cand, "kanzashi", "tree.py")):
         sys.path.insert(0, os.path.abspath(cand))
         break
+from kanzashi import edit as ED  # noqa: E402
 from kanzashi import rewire as R  # noqa: E402
 from kanzashi import strand_uv as UV  # noqa: E402
 from kanzashi import swap as SW  # noqa: E402
@@ -53,6 +56,26 @@ def fail(msg, code=1):
     sys.exit(code)
 
 
+def crown_of(hairs):
+    """The highest point of the hairs (world)."""
+    crown = None
+    for h in hairs:
+        co = np.empty(len(h.data.vertices) * 3, dtype=np.float32)
+        h.data.vertices.foreach_get("co", co)
+        M = np.array(h.matrix_world)
+        w = co.reshape(-1, 3) @ M[:3, :3].T + M[:3, 3]
+        i = int(np.argmax(w[:, 2]))
+        if crown is None or w[i, 2] > crown[2]:
+            crown = w[i]
+    return crown
+
+
+def strand_count(h):
+    s = np.empty(len(h.data.polygons), dtype=np.int32)
+    h.data.attributes["lw_strand"].data.foreach_get("value", s)
+    return int(len(np.unique(s[s >= 0])))
+
+
 def main():
     argv = sys.argv[sys.argv.index("--") + 1 :] if "--" in sys.argv else []
     ap = argparse.ArgumentParser(prog="kanzashi_run.py")
@@ -62,12 +85,17 @@ def main():
     ap.add_argument("--report", help="JSON report")
     ap.add_argument("--cap-len", type=float, default=0.40, help="rings longer than this (m) count as the melted cap")
     ap.add_argument("--no-uv", action="store_true", help="strands only")
+    ap.add_argument("--redetect", action="store_true", help="detect again even where strands exist (edits are lost)")
+    ap.add_argument("--swap", action="store_true", help="draw the hair with the strand UV (textures are transferred)")
+    ap.add_argument("--apply", action="store_true", help="write the bent shape into the mesh and remove the setup")
     a = ap.parse_args(argv)
     for p in (a.out, a.export, a.report):
         if p and os.path.exists(p):
             fail("already exists (nothing is overwritten): %s" % p)
     if not a.out and not a.export and not a.report:
         fail("give --out, --export or --report (otherwise nothing would be kept)")
+    if a.no_uv and (a.swap or a.export):
+        fail("--swap and --export need the strand UV; do not combine them with --no-uv")
     view = bpy.context.view_layer
     if a.hair:
         missing = [n for n in a.hair if n not in bpy.data.objects]
@@ -78,27 +106,29 @@ def main():
         hairs = [o for o in view.objects if looks_like_hair(o)]
     if not hairs:
         fail("no hair mesh found; name them with --hair")
-    crown = None  # the highest point of the hairs
-    for h in hairs:
-        co = np.empty(len(h.data.vertices) * 3, dtype=np.float32)
-        h.data.vertices.foreach_get("co", co)
-        M = np.array(h.matrix_world)
-        w = co.reshape(-1, 3) @ M[:3, :3].T + M[:3, 3]
-        i = int(np.argmax(w[:, 2]))
-        if crown is None or w[i, 2] > crown[2]:
-            crown = w[i]
+    crown = crown_of(hairs)
     rep = dict(ok=True, hairs=[], crown=[float(x) for x in crown])
     done = []
     for h in hairs:
-        name = "LS_Wires_" + h.name
-        h["lw_wires"] = name
-        wires = R.ensure_wires(name, bpy.context.scene.collection)
-        one = dict(name=h.name)
+        one = dict(name=h.name, faces=len(h.data.polygons))
+        kept = "lw_strand" in h.data.attributes and not a.redetect
         try:
-            st = TR.detect_and_bind(h, wires, tuple(float(x) for x in crown), cap_len=a.cap_len)
-            one["wires"] = int(st["wires"])
-            one["filled_faces"] = int(UV.fill_strandless(h.data))
-            one["rest_shift_mm"] = round(TR.rest_shift(h) * 1000, 4)
+            if kept:  # detected before, maybe edited by hand: the strands stay as they are
+                wires = bpy.data.objects.get(h.get("lw_wires", ""))
+                if wires is None:
+                    raise RuntimeError("the hair has strands but its wires object is missing")
+                one["kept_strands"] = True
+                one["wires"] = strand_count(h)
+            else:
+                name = "LS_Wires_" + h.name
+                h["lw_wires"] = name
+                wires = R.ensure_wires(name, bpy.context.scene.collection)
+                st = TR.detect_and_bind(h, wires, tuple(float(x) for x in crown), cap_len=a.cap_len)
+                one["kept_strands"] = False
+                one["wires"] = int(st["wires"])
+                one["filled_faces"] = int(UV.fill_strandless(h.data))
+                one["rest_shift_mm"] = round(TR.rest_shift(h) * 1000, 4)
+            one["vertices"] = len(h.data.vertices)
             if not a.no_uv:
                 uv = UV.strand_uv_auto(h, wires)
                 one["uv"] = dict(
@@ -118,17 +148,34 @@ def main():
         UV.pack_together(done)
         c = UV.uv_check(done)
         rep["check"] = c
+        if not c["ok"]:
+            rep["ok"] = False
         if a.export:
             if c["ok"]:
                 rep["export"] = SW.export_for_texture(done, os.path.abspath(a.export))
             else:
                 rep["export"] = "skipped: the UV check failed"
+        if a.swap:
+            if c["ok"]:
+                r = SW.swap_uv(done)
+                rep["swap"] = {k: v for k, v in r.items() if isinstance(v, (int, float, str, list))}
+            else:
+                rep["swap"] = "skipped: the UV check failed"
+    if a.apply:
+        rep["apply"] = []
+        for h in done:
+            try:
+                r = ED.finalize(h, bpy.data.objects.get(h.get("lw_wires", "")))
+                rep["apply"].append(dict(name=h.name, moved_mm=round(float(r["moved_mm"]), 3)))
+            except Exception as e:
+                rep["apply"].append(dict(name=h.name, error=repr(e)))
                 rep["ok"] = False
+        UV.drop_unused_groups()
     if a.out:
         bpy.ops.wm.save_as_mainfile(filepath=os.path.abspath(a.out), copy=True)
         rep["saved"] = os.path.abspath(a.out)
     if a.report:
-        json.dump(rep, open(a.report, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+        json.dump(rep, open(a.report, "w", encoding="utf-8"), ensure_ascii=False, indent=1, default=str)
     print("KANZASHI " + json.dumps(rep, ensure_ascii=True, default=str))
     sys.exit(0 if rep["ok"] else 1)
 

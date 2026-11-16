@@ -9,7 +9,7 @@ without the panel (scripts/kanzashi_run.py)."""
 bl_info = {
     "name": "Kanzashi",
     "author": "Lida",
-    "version": (0, 3, 0),
+    "version": (0, 4, 0),
     "blender": (5, 3, 0),
     "location": "3D Viewport > Sidebar (N) > Kanzashi",
     "description": "Hair strands of generated meshes: detect, repaint, bend by wires, UV per strand",

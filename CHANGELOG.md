@@ -1,5 +1,14 @@
 # 変更履歴
 
+## 0.4.0（試作）
+
+- エージェント向けのスキル `skills/kanzashi/SKILL.md`（英語は `SKILL.en.md`）と入口 `AGENTS.md`。髪の調整の流れと、ユーザーに確認する所を決めた。
+- `scripts/kanzashi_run.py`：検出済みの髪は毛束を残して UV だけを作り直す。`--swap`（張り替え）、`--apply`（形の確定）、`--redetect`（検出のやり直し）を足した。UV の検査に落ちたときは終了コードが 1 になる。
+- `scripts/kanzashi_preview.py`：毛束ごとの色の画像（前・後ろ・左・右と UV）を出す。
+- `tools/install_addon.py`：アドオンが入っているかを調べる（`--check`）、ZIP を作って拡張機能として入れる。
+
+English: a skill for agents (`skills/kanzashi/`), `kanzashi_run.py` keeps existing strands and gained `--swap`, `--apply`, `--redetect`; `kanzashi_preview.py` renders the strand colours; `tools/install_addon.py` checks and installs the add-on.
+
 ## 0.3.0（試作）
 
 動きは変えずに、コードを整理した。
