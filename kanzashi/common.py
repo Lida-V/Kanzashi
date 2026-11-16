@@ -23,7 +23,7 @@ UV.TRANSLATE = T  # the progress texts of the slow steps
 R = S.R
 
 
-TOOL = "lida.hs_face_tool"
+TOOL = "kanzashi.face_tool"
 
 
 WORDS = ("hair", "bangs", "braid", "ponytail", "sidelock", "ahoge", "髪", "前髪", "毛")

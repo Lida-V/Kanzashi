@@ -27,8 +27,8 @@ from .common import (
 )
 
 
-class LIDA_OT_hs_start(bpy.types.Operator):
-    bl_idname = "lida.hs_start"
+class KANZASHI_OT_start(bpy.types.Operator):
+    bl_idname = "kanzashi.start"
     bl_label = "色を直すモードに入る"
     bl_description = "髪を色そのままで表示し、スポイトとブラシが使える状態にします"
 
@@ -44,8 +44,8 @@ class LIDA_OT_hs_start(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class LIDA_OT_hs_stop(bpy.types.Operator):
-    bl_idname = "lida.hs_stop"
+class KANZASHI_OT_stop(bpy.types.Operator):
+    bl_idname = "kanzashi.stop"
     bl_label = "色を直すモードを終わる"
     bl_description = "通常のモードへ戻ります（塗った結果は残ります）"
 
@@ -58,8 +58,8 @@ class LIDA_OT_hs_stop(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class LIDA_OT_hs_stroke(bpy.types.Operator):
-    bl_idname = "lida.hs_stroke"
+class KANZASHI_OT_stroke(bpy.types.Operator):
+    bl_idname = "kanzashi.stroke"
     bl_label = "毛束の色を塗る"
     bl_description = "スポイト：クリックした面の色を拾う。ブラシ：なぞった面を今の色にして、そのワイヤーへ付け替える"
     bl_options = {"REGISTER", "UNDO"}
@@ -155,8 +155,8 @@ class LIDA_OT_hs_stroke(bpy.types.Operator):
         return {"RUNNING_MODAL"}
 
 
-class LIDA_OT_hs_eye(bpy.types.Operator):
-    bl_idname = "lida.hs_eye"
+class KANZASHI_OT_eye(bpy.types.Operator):
+    bl_idname = "kanzashi.eye"
     bl_label = "この色を隠す／表示する"
     wire: bpy.props.IntProperty(default=-1)
 
@@ -181,8 +181,8 @@ class LIDA_OT_hs_eye(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class LIDA_OT_hs_solo(bpy.types.Operator):
-    bl_idname = "lida.hs_solo"
+class KANZASHI_OT_solo(bpy.types.Operator):
+    bl_idname = "kanzashi.solo"
     bl_label = "この色だけ表示する"
     wire: bpy.props.IntProperty(default=-1)
 
@@ -201,8 +201,8 @@ class LIDA_OT_hs_solo(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class LIDA_OT_hs_new(bpy.types.Operator):
-    bl_idname = "lida.hs_new"
+class KANZASHI_OT_new(bpy.types.Operator):
+    bl_idname = "kanzashi.new"
     bl_label = "新しい色（ワイヤー）を足す"
     bl_description = "新しい色を作ります。その色で面を塗ると、塗った面の真ん中を通るワイヤーが自動で引かれます"
     bl_options = {"REGISTER", "UNDO"}
@@ -220,8 +220,8 @@ class LIDA_OT_hs_new(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class LIDA_OT_hs_size(bpy.types.Operator):
-    bl_idname = "lida.hs_size"
+class KANZASHI_OT_size(bpy.types.Operator):
+    bl_idname = "kanzashi.size"
     bl_label = "ブラシの太さを変える"
     factor: bpy.props.FloatProperty(default=1.25)
 

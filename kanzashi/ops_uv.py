@@ -74,8 +74,8 @@ class _BusyOp:
                 a.tag_redraw()
 
 
-class LIDA_OT_hs_uvshow(bpy.types.Operator):
-    bl_idname = "lida.hs_uvshow"
+class KANZASHI_OT_uvshow(bpy.types.Operator):
+    bl_idname = "kanzashi.uvshow"
     bl_label = "作った UV を選ぶ／元の UV に戻す"
     bl_description = "UV エディターに出す UV マップを、毛束ごとの UV（LW_StrandUV）と元の UV の間で切り替えます。描画に使う UV は変えません"
     strand: bpy.props.BoolProperty(default=True)
@@ -96,8 +96,8 @@ class LIDA_OT_hs_uvshow(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class LIDA_OT_hs_uv(_BusyOp, bpy.types.Operator):
-    bl_idname = "lida.hs_uv"
+class KANZASHI_OT_uv(_BusyOp, bpy.types.Operator):
+    bl_idname = "kanzashi.uv"
     bl_label = "毛束ごとの UV を作る"
     bl_options = {"REGISTER", "UNDO"}
     bl_description = "毛束ごとの UV を作って検査します。数十秒かかります（進み具合はパネルの上と画面の下に出ます）"
@@ -144,8 +144,8 @@ def _check_text(c):
     return T("検査 NG：") + T("、").join(bad)
 
 
-class LIDA_OT_hs_uvswap(_BusyOp, bpy.types.Operator):
-    bl_idname = "lida.hs_uvswap"
+class KANZASHI_OT_uvswap(_BusyOp, bpy.types.Operator):
+    bl_idname = "kanzashi.uvswap"
     bl_label = "UV を張り替える"
     bl_options = {"REGISTER", "UNDO"}
     bl_description = (
@@ -194,8 +194,8 @@ class LIDA_OT_hs_uvswap(_BusyOp, bpy.types.Operator):
         return {"FINISHED"}
 
 
-class LIDA_OT_hs_uvdrop(bpy.types.Operator):
-    bl_idname = "lida.hs_uvdrop"
+class KANZASHI_OT_uvdrop(bpy.types.Operator):
+    bl_idname = "kanzashi.uvdrop"
     bl_label = "古い UV を消す（戻せません）"
     bl_options = {"REGISTER", "UNDO"}
     bl_description = "張り替え済みの髪から、毛束ごとの UV 以外の UV マップを消します。消した後は「元の UV に戻す」は使えません。元の材質と画像は消しません"
@@ -211,8 +211,8 @@ class LIDA_OT_hs_uvdrop(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class LIDA_OT_hs_export(bpy.types.Operator):
-    bl_idname = "lida.hs_export"
+class KANZASHI_OT_export(bpy.types.Operator):
+    bl_idname = "kanzashi.export"
     bl_label = "テクスチャ用に書き出す"
     bl_description = (
         "登録した髪を 1 つのメッシュにまとめ、毛束ごとの UV だけを持たせて FBX（または .glb）で書き出します。"

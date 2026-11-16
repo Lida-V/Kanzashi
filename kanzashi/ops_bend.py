@@ -30,8 +30,8 @@ from .common import (
 )
 
 
-class LIDA_OT_hs_bend(bpy.types.Operator):
-    bl_idname = "lida.hs_bend"
+class KANZASHI_OT_bend(bpy.types.Operator):
+    bl_idname = "kanzashi.bend"
     bl_label = "ワイヤーのつまみを出して髪を曲げる"
     bl_description = "選んである色のワイヤーに、丸いつまみを出します。つまみを動かすと、その毛束が付いてきます"
     bl_options = {"REGISTER", "UNDO"}
@@ -74,8 +74,8 @@ class LIDA_OT_hs_bend(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class LIDA_OT_hs_bend_pick(bpy.types.Operator):
-    bl_idname = "lida.hs_bend_pick"
+class KANZASHI_OT_bend_pick(bpy.types.Operator):
+    bl_idname = "kanzashi.bend_pick"
     bl_label = "曲げる毛束を選ぶ"
     bl_description = "つまみが出ている間、髪の面をクリックすると、その色のワイヤーのつまみに切り替わります"
     bl_options = {"REGISTER", "UNDO"}
@@ -119,8 +119,8 @@ class LIDA_OT_hs_bend_pick(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class LIDA_OT_hs_escape(bpy.types.Operator):
-    bl_idname = "lida.hs_escape"
+class KANZASHI_OT_escape(bpy.types.Operator):
+    bl_idname = "kanzashi.escape"
     bl_label = "一つ戻る／終わる"
     bl_description = "Esc：今の道具や絞り込みをやめる。何も選んでいない状態なら、そのモード自体を終わる"
 
@@ -140,7 +140,7 @@ class LIDA_OT_hs_escape(bpy.types.Operator):
                 sc.lida_hs_mode = "PICK"
                 self.report({"INFO"}, T("スポイトに戻しました（もう一度 Esc で、色を直すモードを終わります）"))
             else:
-                bpy.ops.lida.hs_stop()
+                bpy.ops.kanzashi.stop()
                 self.report({"INFO"}, T("色を直すモードを終わりました"))
             if context.area:
                 context.area.tag_redraw()
@@ -152,7 +152,7 @@ class LIDA_OT_hs_escape(bpy.types.Operator):
                     g.select_set(False)
                 self.report({"INFO"}, T("つまみの選択を外しました（もう一度 Esc で、曲げるモードを終わります）"))
             else:
-                bpy.ops.lida.hs_bend(on=False)
+                bpy.ops.kanzashi.bend(on=False)
                 self.report({"INFO"}, T("曲げるモードを終わりました"))
             if context.area:
                 context.area.tag_redraw()
@@ -185,8 +185,8 @@ def leave_modes(context):
     _trees.clear()
 
 
-class LIDA_OT_hs_quit(bpy.types.Operator):
-    bl_idname = "lida.hs_quit"
+class KANZASHI_OT_quit(bpy.types.Operator):
+    bl_idname = "kanzashi.quit"
     bl_label = "ツールを終わる"
     bl_description = "色を直すモード・曲げるモードを終わり、隠した物と面をすべて表示に戻します。曲げる仕組みとワイヤーは残るので、後で続きができます"
     bl_options = {"REGISTER", "UNDO"}
@@ -204,8 +204,8 @@ class LIDA_OT_hs_quit(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class LIDA_OT_hs_finalize(bpy.types.Operator):
-    bl_idname = "lida.hs_finalize"
+class KANZASHI_OT_finalize(bpy.types.Operator):
+    bl_idname = "kanzashi.finalize"
     bl_label = "曲げた形を確定して仕組みを外す"
     bl_description = "曲げた形をメッシュに書き込み、曲げる仕組み・ワイヤー・結び付けの情報を外します。毛束ごとの色と UV は残ります。確定後にまた曲げるには、検出からやり直します"
     bl_options = {"REGISTER", "UNDO"}

@@ -9,33 +9,39 @@ import bpy
 from . import i18n as LANG
 from . import swap as SW
 from .common import TOOL, T, _current, _detected, _draw_cursor, _picked_to_add, _row_picked, registered
-from .ops_bend import LIDA_OT_hs_bend, LIDA_OT_hs_bend_pick, LIDA_OT_hs_escape, LIDA_OT_hs_finalize, LIDA_OT_hs_quit
+from .ops_bend import (
+    KANZASHI_OT_bend,
+    KANZASHI_OT_bend_pick,
+    KANZASHI_OT_escape,
+    KANZASHI_OT_finalize,
+    KANZASHI_OT_quit,
+)
 from .ops_hair import (
-    LIDA_OT_hs_add,
-    LIDA_OT_hs_auto,
-    LIDA_OT_hs_detect,
-    LIDA_OT_hs_isolate,
-    LIDA_OT_hs_remove,
-    LIDA_UL_hs_wires,
-    LidaHsItem,
-    LidaHsWire,
+    KANZASHI_OT_add,
+    KANZASHI_OT_auto,
+    KANZASHI_OT_detect,
+    KANZASHI_OT_isolate,
+    KANZASHI_OT_remove,
+    KANZASHI_UL_wires,
+    KanzashiHair,
+    KanzashiWireRow,
 )
 from .ops_paint import (
-    LIDA_OT_hs_eye,
-    LIDA_OT_hs_new,
-    LIDA_OT_hs_size,
-    LIDA_OT_hs_solo,
-    LIDA_OT_hs_start,
-    LIDA_OT_hs_stop,
-    LIDA_OT_hs_stroke,
+    KANZASHI_OT_eye,
+    KANZASHI_OT_new,
+    KANZASHI_OT_size,
+    KANZASHI_OT_solo,
+    KANZASHI_OT_start,
+    KANZASHI_OT_stop,
+    KANZASHI_OT_stroke,
 )
-from .ops_uv import LIDA_OT_hs_export, LIDA_OT_hs_uv, LIDA_OT_hs_uvdrop, LIDA_OT_hs_uvshow, LIDA_OT_hs_uvswap
+from .ops_uv import KANZASHI_OT_export, KANZASHI_OT_uv, KANZASHI_OT_uvdrop, KANZASHI_OT_uvshow, KANZASHI_OT_uvswap
 
 _keys = []  # the keymap items added at registration
 _cursor = None  # the handle of the brush circle
 
 
-class LidaHsFaceTool(bpy.types.WorkSpaceTool):
+class KanzashiFaceTool(bpy.types.WorkSpaceTool):
     bl_space_type = "VIEW_3D"
     bl_context_mode = "PAINT_VERTEX"
     bl_idname = TOOL
@@ -43,15 +49,15 @@ class LidaHsFaceTool(bpy.types.WorkSpaceTool):
     bl_description = "スポイトで色を拾い、ブラシで面をその色にします（パネル「Kanzashi」で切り替え。Ctrl+クリックはいつでもスポイト）"
     bl_icon = "brush.paint_vertex.draw"
     bl_keymap = (
-        ("lida.hs_stroke", {"type": "LEFTMOUSE", "value": "PRESS"}, {"properties": [("pick", False)]}),
-        ("lida.hs_stroke", {"type": "LEFTMOUSE", "value": "PRESS", "ctrl": True}, {"properties": [("pick", True)]}),
-        ("lida.hs_stroke", {"type": "LEFTMOUSE", "value": "PRESS", "shift": True}, {"properties": [("focus", True)]}),
+        ("kanzashi.stroke", {"type": "LEFTMOUSE", "value": "PRESS"}, {"properties": [("pick", False)]}),
+        ("kanzashi.stroke", {"type": "LEFTMOUSE", "value": "PRESS", "ctrl": True}, {"properties": [("pick", True)]}),
+        ("kanzashi.stroke", {"type": "LEFTMOUSE", "value": "PRESS", "shift": True}, {"properties": [("focus", True)]}),
     )
 
 
-class LIDA_PT_hs(bpy.types.Panel):
+class KANZASHI_PT_main(bpy.types.Panel):
     bl_label = "Kanzashi（かんざし）試作"
-    bl_idname = "LIDA_PT_hs"
+    bl_idname = "KANZASHI_PT_main"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Kanzashi"
@@ -88,19 +94,19 @@ class LIDA_PT_hs(bpy.types.Panel):
         box = lay.box()
         box.label(text=T("① 対象の髪を決める"), icon="OUTLINER_OB_MESH")
         row = box.row(align=True)
-        row.operator("lida.hs_auto", text=T("自動で登録"), icon="VIEWZOOM")
-        row.operator("lida.hs_add", text=T("選択を足す"), icon="ADD")
+        row.operator("kanzashi.auto", text=T("自動で登録"), icon="VIEWZOOM")
+        row.operator("kanzashi.add", text=T("選択を足す"), icon="ADD")
         for i, it in enumerate(sc.lida_hs_list):
             row = box.row(align=True)
             if it.obj is None:
                 row.label(text=T("（消えた物体）"), icon="ERROR")
             else:
                 row.label(text=it.obj.name, icon="CHECKMARK" if _detected(it.obj) else "MESH_DATA")
-            row.operator("lida.hs_remove", text="", icon="X").index = i
+            row.operator("kanzashi.remove", text="", icon="X").index = i
         box.prop(sc, "lida_hs_pick_add", text=T("名前で足す"))
         row = box.row(align=True)
-        row.operator("lida.hs_isolate", text=T("髪だけ表示"), icon="HIDE_ON").on = True
-        row.operator("lida.hs_isolate", text=T("隠した物を戻す"), icon="HIDE_OFF").on = False
+        row.operator("kanzashi.isolate", text=T("髪だけ表示"), icon="HIDE_ON").on = True
+        row.operator("kanzashi.isolate", text=T("隠した物を戻す"), icon="HIDE_OFF").on = False
 
         box = lay.box()
         box.label(text=T("② 毛束を検出する"), icon="OUTLINER_OB_CURVES")
@@ -115,18 +121,18 @@ class LIDA_PT_hs(bpy.types.Panel):
             col.alert = True
             col.label(text=T("もう一度検出すると、塗り直しと"), icon="ERROR")
             col.label(text=T("曲げた形が作り直されて消えます"))
-            box.operator("lida.hs_detect", text=T("検出をやり直す（確認が出ます）"))
+            box.operator("kanzashi.detect", text=T("検出をやり直す（確認が出ます）"))
         else:
-            box.operator("lida.hs_detect", text=T("毛束を検出（1 本ごとに色が付く）"))
+            box.operator("kanzashi.detect", text=T("毛束を検出（1 本ごとに色が付く）"))
         box.label(text=T("写しのファイルで行う（メッシュを切ります）"))
 
         box = lay.box()
         box.label(text=T("③ 色の違う所を直す"), icon="BRUSH_DATA")
         box.enabled = bool(det)
         if not painting:
-            box.operator("lida.hs_start", text=T(LIDA_OT_hs_start._ja[0]), icon="PLAY")
+            box.operator("kanzashi.start", text=T(KANZASHI_OT_start._ja[0]), icon="PLAY")
         else:
-            box.operator("lida.hs_stop", text=T(LIDA_OT_hs_stop._ja[0]), icon="PAUSE")
+            box.operator("kanzashi.stop", text=T(KANZASHI_OT_stop._ja[0]), icon="PAUSE")
             row = box.row(align=True)
             row.scale_y = 1.4
             row.prop_enum(sc, "lida_hs_mode", "PICK", text=T("スポイト"), icon="EYEDROPPER")
@@ -136,11 +142,11 @@ class LIDA_PT_hs(bpy.types.Panel):
             row.prop_enum(
                 sc, "lida_hs_mode", "FOCUS", text=T("塗りたい相手をクリック → 2 色だけ表示"), icon="ZOOM_SELECTED"
             )
-            row.operator("lida.hs_eye", text="", icon="HIDE_OFF").wire = -1
+            row.operator("kanzashi.eye", text="", icon="HIDE_OFF").wire = -1
             row = box.row(align=True)
             row.prop(sc, "lida_hs_radius", text=T("ブラシの太さ"))
-            row.operator("lida.hs_size", text="", icon="REMOVE").factor = 0.8
-            row.operator("lida.hs_size", text="", icon="ADD").factor = 1.25
+            row.operator("kanzashi.size", text="", icon="REMOVE").factor = 0.8
+            row.operator("kanzashi.size", text="", icon="ADD").factor = 1.25
             box.label(text=T("[ ] キーでも太さを変えられます。面 1 枚が最小です"))
             col = box.column(align=True)
             col.label(text=T("スポイト：面をクリックで色を拾う"))
@@ -153,10 +159,10 @@ class LIDA_PT_hs(bpy.types.Panel):
         if det and hair is not None:
             cur = int(hair.get("lw_current", -1))
             box.label(text=T("色の一覧（%s）　今の色：%s") % (hair.name, cur if cur >= 0 else T("なし")))
-            box.template_list("LIDA_UL_hs_wires", "", sc, "lida_hs_wires", sc, "lida_hs_wire_index", rows=8)
+            box.template_list("KANZASHI_UL_wires", "", sc, "lida_hs_wires", sc, "lida_hs_wire_index", rows=8)
             row = box.row(align=True)
-            row.operator("lida.hs_eye", text=T("全部表示"), icon="HIDE_OFF").wire = -1
-            row.operator("lida.hs_new", text=T("新しい色を足す"), icon="ADD")
+            row.operator("kanzashi.eye", text=T("全部表示"), icon="HIDE_OFF").wire = -1
+            row.operator("kanzashi.new", text=T("新しい色を足す"), icon="ADD")
             box.label(text=T("行をクリック：その色を選ぶ／目：隠す／矢印：その色だけ"))
 
         box = lay.box()
@@ -164,7 +170,7 @@ class LIDA_PT_hs(bpy.types.Panel):
         box.enabled = bool(det)
         editing = bool(sc.get("lida_hs_grips"))
         if not editing:
-            box.operator("lida.hs_bend", text=T(LIDA_OT_hs_bend._ja[0]), icon="PLAY").on = True
+            box.operator("kanzashi.bend", text=T(KANZASHI_OT_bend._ja[0]), icon="PLAY").on = True
             box.label(text=T("押した後、曲げたい毛束の面をクリック"))
         else:
             box.label(text=T("ワイヤー %d を曲げています") % int(sc.get("lida_hs_bend_wire", -1)))
@@ -175,24 +181,24 @@ class LIDA_PT_hs(bpy.types.Panel):
             col.label(text=T("Shift+クリックで複数選べます"))
             col.label(text=T("根元の 5 cm は動きません（その先が曲がる）"))
             col.label(text=T("色の一覧の目・矢印で、見せる毛束を絞れます"))
-            box.operator("lida.hs_bend", text=T("曲げ終わる（つまみを消す）"), icon="PAUSE").on = False
+            box.operator("kanzashi.bend", text=T("曲げ終わる（つまみを消す）"), icon="PAUSE").on = False
 
         box = lay.box()
         box.label(text=T("⑤ 毛束ごとの UV"), icon="UV")
         box.enabled = bool(det)
-        box.operator("lida.hs_uv", text=T(LIDA_OT_hs_uv._ja[0]))
+        box.operator("kanzashi.uv", text=T(KANZASHI_OT_uv._ja[0]))
         box.label(text=T("数十秒かかります（進み具合が上に出ます）"))
         have = [h.name for h in det if "LW_StrandUV" in h.data.uv_layers]
         if have:
             box.label(text=T("作成済み：%s") % T("、").join(have), icon="CHECKMARK")
             box.label(text=T("UV マップ名は LW_StrandUV（元の UV はそのまま）"))
             row = box.row(align=True)
-            row.operator("lida.hs_uvshow", text=T("作った UV を選ぶ")).strand = True
-            row.operator("lida.hs_uvshow", text=T("元の UV に戻す")).strand = False
+            row.operator("kanzashi.uvshow", text=T("作った UV を選ぶ")).strand = True
+            row.operator("kanzashi.uvshow", text=T("元の UV に戻す")).strand = False
             chk = sc.get("lida_hs_uvcheck", "")
             if chk:
                 box.label(text=chk, icon="CHECKMARK" if chk.startswith(("検査 OK", "Check OK")) else "ERROR")
-            box.operator("lida.hs_export", text=T(LIDA_OT_hs_export._ja[0]), icon="EXPORT")
+            box.operator("kanzashi.export", text=T(KANZASHI_OT_export._ja[0]), icon="EXPORT")
             box.label(text=T("髪を 1 つにまとめ、この UV だけで FBX に出す"))
             swapped = [h.name for h in det if h.get(SW.SWAP_KEY)]
             col = box.column(align=True)
@@ -200,10 +206,10 @@ class LIDA_PT_hs(bpy.types.Panel):
                 col.label(text=T("張り替え済み：%s") % T("、").join(swapped), icon="CHECKMARK")
                 if sc.get("lida_hs_swapcheck", ""):
                     col.label(text=sc["lida_hs_swapcheck"])
-                col.operator("lida.hs_uvswap", text=T("元の UV・材質に戻す"), icon="LOOP_BACK").on = False
+                col.operator("kanzashi.uvswap", text=T("元の UV・材質に戻す"), icon="LOOP_BACK").on = False
             else:
                 col.operator(
-                    "lida.hs_uvswap", text=T("この UV に張り替える（見た目はそのまま）"), icon="UV_SYNC_SELECT"
+                    "kanzashi.uvswap", text=T("この UV に張り替える（見た目はそのまま）"), icon="UV_SYNC_SELECT"
                 ).on = True
                 col.label(text=T("今のテクスチャを新しい UV へ写します"))
         else:
@@ -211,45 +217,45 @@ class LIDA_PT_hs(bpy.types.Panel):
 
         box = lay.box()
         box.label(text=T("⑥ 終わる"), icon="CHECKMARK")
-        box.operator("lida.hs_quit", text=T(LIDA_OT_hs_quit._ja[0]), icon="PAUSE")
+        box.operator("kanzashi.quit", text=T(KANZASHI_OT_quit._ja[0]), icon="PAUSE")
         box.label(text=T("表示を元に戻す。後で続きができます"))
         if any(h.get(SW.SWAP_KEY) for h in det):
             sub = box.column()
             sub.alert = True
-            sub.operator("lida.hs_uvdrop", text=T(LIDA_OT_hs_uvdrop._ja[0]), icon="TRASH")
+            sub.operator("kanzashi.uvdrop", text=T(KANZASHI_OT_uvdrop._ja[0]), icon="TRASH")
         sub = box.column()
         sub.enabled = bool(det)
-        sub.operator("lida.hs_finalize", text=T(LIDA_OT_hs_finalize._ja[0]), icon="LOCKED")
+        sub.operator("kanzashi.finalize", text=T(KANZASHI_OT_finalize._ja[0]), icon="LOCKED")
         sub.label(text=T("形をメッシュに書き込み、ワイヤーを外す"))
 
 
 CLASSES = (
-    LidaHsItem,
-    LidaHsWire,
-    LIDA_UL_hs_wires,
-    LIDA_OT_hs_auto,
-    LIDA_OT_hs_add,
-    LIDA_OT_hs_remove,
-    LIDA_OT_hs_isolate,
-    LIDA_OT_hs_detect,
-    LIDA_OT_hs_start,
-    LIDA_OT_hs_stop,
-    LIDA_OT_hs_stroke,
-    LIDA_OT_hs_eye,
-    LIDA_OT_hs_solo,
-    LIDA_OT_hs_new,
-    LIDA_OT_hs_size,
-    LIDA_OT_hs_bend,
-    LIDA_OT_hs_bend_pick,
-    LIDA_OT_hs_escape,
-    LIDA_OT_hs_quit,
-    LIDA_OT_hs_finalize,
-    LIDA_OT_hs_uvshow,
-    LIDA_OT_hs_uv,
-    LIDA_OT_hs_uvswap,
-    LIDA_OT_hs_uvdrop,
-    LIDA_OT_hs_export,
-    LIDA_PT_hs,
+    KanzashiHair,
+    KanzashiWireRow,
+    KANZASHI_UL_wires,
+    KANZASHI_OT_auto,
+    KANZASHI_OT_add,
+    KANZASHI_OT_remove,
+    KANZASHI_OT_isolate,
+    KANZASHI_OT_detect,
+    KANZASHI_OT_start,
+    KANZASHI_OT_stop,
+    KANZASHI_OT_stroke,
+    KANZASHI_OT_eye,
+    KANZASHI_OT_solo,
+    KANZASHI_OT_new,
+    KANZASHI_OT_size,
+    KANZASHI_OT_bend,
+    KANZASHI_OT_bend_pick,
+    KANZASHI_OT_escape,
+    KANZASHI_OT_quit,
+    KANZASHI_OT_finalize,
+    KANZASHI_OT_uvshow,
+    KANZASHI_OT_uv,
+    KANZASHI_OT_uvswap,
+    KANZASHI_OT_uvdrop,
+    KANZASHI_OT_export,
+    KANZASHI_PT_main,
 )
 
 
@@ -260,7 +266,7 @@ def _tip(cls, context, properties):
 def _localize():
     """The labels and tooltips that Blender reads once, at registration, in the language in use now. The Japanese
     originals are kept in _ja; operator tooltips are also answered live (description), so they follow a later switch."""
-    for c in CLASSES + (LidaHsFaceTool,):
+    for c in CLASSES + (KanzashiFaceTool,):
         if "_ja" not in c.__dict__:
             c._ja = (c.__dict__.get("bl_label", ""), c.__dict__.get("bl_description", ""))
         if c._ja[0]:
@@ -294,8 +300,8 @@ def register():
         update=_lang_changed,
     )
     sc = bpy.types.Scene
-    sc.lida_hs_list = bpy.props.CollectionProperty(type=LidaHsItem)
-    sc.lida_hs_wires = bpy.props.CollectionProperty(type=LidaHsWire)
+    sc.lida_hs_list = bpy.props.CollectionProperty(type=KanzashiHair)
+    sc.lida_hs_wires = bpy.props.CollectionProperty(type=KanzashiWireRow)
     sc.lida_hs_wire_index = bpy.props.IntProperty(default=-1, update=_row_picked)
     sc.lida_hs_hair = bpy.props.PointerProperty(type=bpy.types.Object, poll=lambda s, o: o.type == "MESH")
     sc.lida_hs_cap = bpy.props.FloatProperty(default=0.40, min=0.05, max=2.0, subtype="DISTANCE")
@@ -316,9 +322,9 @@ def register():
         type=bpy.types.Object, poll=lambda s, o: o.type == "MESH", update=_picked_to_add
     )
     try:
-        bpy.utils.register_tool(LidaHsFaceTool, separator=True)
+        bpy.utils.register_tool(KanzashiFaceTool, separator=True)
     except Exception as e:
-        print("lida hair: the tool could not be registered:", e)
+        print("Kanzashi: the tool could not be registered:", e)
     kc = bpy.context.window_manager.keyconfigs.addon
     if kc is not None:  # so the click is ours with any toolbar tool, Blender's brushes included
         km = kc.keymaps.new(name="Vertex Paint", space_type="EMPTY")
@@ -326,18 +332,18 @@ def register():
             km2 = kc.keymaps.new(name=name, space_type="EMPTY" if name == "Object Mode" else "VIEW_3D")
             for value in ("PRESS",):
                 for shift in (False, True):
-                    kmi = km2.keymap_items.new("lida.hs_bend_pick", "LEFTMOUSE", value, shift=shift, head=True)
+                    kmi = km2.keymap_items.new("kanzashi.bend_pick", "LEFTMOUSE", value, shift=shift, head=True)
                     _keys.append((km2, kmi))
         for name in ("Vertex Paint", "Object Mode"):
             km3 = kc.keymaps.new(name=name, space_type="EMPTY")
-            kmi = km3.keymap_items.new("lida.hs_escape", "ESC", "PRESS", head=True)
+            kmi = km3.keymap_items.new("kanzashi.escape", "ESC", "PRESS", head=True)
             _keys.append((km3, kmi))
         for key, fac in (("LEFT_BRACKET", 0.8), ("RIGHT_BRACKET", 1.25)):
-            kmi = km.keymap_items.new("lida.hs_size", key, "PRESS", head=True)
+            kmi = km.keymap_items.new("kanzashi.size", key, "PRESS", head=True)
             kmi.properties.factor = fac
             _keys.append((km, kmi))
         for ctrl, shift in ((False, False), (True, False), (False, True)):
-            kmi = km.keymap_items.new("lida.hs_stroke", "LEFTMOUSE", "PRESS", ctrl=ctrl, shift=shift, head=True)
+            kmi = km.keymap_items.new("kanzashi.stroke", "LEFTMOUSE", "PRESS", ctrl=ctrl, shift=shift, head=True)
             kmi.properties.pick = ctrl
             kmi.properties.focus = shift
             _keys.append((km, kmi))
@@ -348,7 +354,7 @@ def register():
 
 def unregister():
     try:
-        bpy.utils.unregister_tool(LidaHsFaceTool)
+        bpy.utils.unregister_tool(KanzashiFaceTool)
     except Exception:
         pass
     global _cursor

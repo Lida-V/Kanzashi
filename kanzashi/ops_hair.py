@@ -21,11 +21,11 @@ from .common import (
 )
 
 
-class LidaHsItem(bpy.types.PropertyGroup):
+class KanzashiHair(bpy.types.PropertyGroup):
     obj: bpy.props.PointerProperty(type=bpy.types.Object)
 
 
-class LidaHsWire(bpy.types.PropertyGroup):
+class KanzashiWireRow(bpy.types.PropertyGroup):
     wire: bpy.props.IntProperty()
     faces: bpy.props.IntProperty()
     kind: bpy.props.StringProperty()
@@ -33,7 +33,7 @@ class LidaHsWire(bpy.types.PropertyGroup):
     color: bpy.props.FloatVectorProperty(subtype="COLOR", size=3, min=0.0, max=1.0)
 
 
-class LIDA_UL_hs_wires(bpy.types.UIList):
+class KANZASHI_UL_wires(bpy.types.UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         row = layout.row(align=True)
         sw = row.row(align=True)
@@ -41,14 +41,14 @@ class LIDA_UL_hs_wires(bpy.types.UIList):
         sw.prop(item, "color", text="")
         kind = {"base": T("基準"), "branch": T("枝"), "loose": T("部品"), "new": T("新規")}.get(item.kind, item.kind)
         row.label(text=T("%d  %s  %d 面") % (item.wire, kind, item.faces))
-        row.operator("lida.hs_solo", text="", icon="RESTRICT_SELECT_OFF", emboss=False).wire = item.wire
+        row.operator("kanzashi.solo", text="", icon="RESTRICT_SELECT_OFF", emboss=False).wire = item.wire
         row.operator(
-            "lida.hs_eye", text="", icon="HIDE_ON" if item.hidden else "HIDE_OFF", emboss=False
+            "kanzashi.eye", text="", icon="HIDE_ON" if item.hidden else "HIDE_OFF", emboss=False
         ).wire = item.wire
 
 
-class LIDA_OT_hs_auto(bpy.types.Operator):
-    bl_idname = "lida.hs_auto"
+class KANZASHI_OT_auto(bpy.types.Operator):
+    bl_idname = "kanzashi.auto"
     bl_label = "髪を自動で登録"
     bl_description = "見えているメッシュのうち、名前か材質の名前から髪と判断した物を登録し、ほかを隠します"
     bl_options = {"REGISTER", "UNDO"}
@@ -61,8 +61,8 @@ class LIDA_OT_hs_auto(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class LIDA_OT_hs_add(bpy.types.Operator):
-    bl_idname = "lida.hs_add"
+class KANZASHI_OT_add(bpy.types.Operator):
+    bl_idname = "kanzashi.add"
     bl_label = "選んだメッシュを足す"
     bl_options = {"REGISTER", "UNDO"}
 
@@ -83,8 +83,8 @@ class LIDA_OT_hs_add(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class LIDA_OT_hs_remove(bpy.types.Operator):
-    bl_idname = "lida.hs_remove"
+class KANZASHI_OT_remove(bpy.types.Operator):
+    bl_idname = "kanzashi.remove"
     bl_label = "登録から外す"
     bl_options = {"REGISTER", "UNDO"}
     index: bpy.props.IntProperty(default=-1)
@@ -98,8 +98,8 @@ class LIDA_OT_hs_remove(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class LIDA_OT_hs_isolate(bpy.types.Operator):
-    bl_idname = "lida.hs_isolate"
+class KANZASHI_OT_isolate(bpy.types.Operator):
+    bl_idname = "kanzashi.isolate"
     bl_label = "髪だけ表示"
     bl_description = "登録した髪とそのワイヤー以外を隠す／隠した物を戻す"
     on: bpy.props.BoolProperty(default=True)
@@ -112,8 +112,8 @@ class LIDA_OT_hs_isolate(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class LIDA_OT_hs_detect(bpy.types.Operator):
-    bl_idname = "lida.hs_detect"
+class KANZASHI_OT_detect(bpy.types.Operator):
+    bl_idname = "kanzashi.detect"
     bl_label = "毛束を検出してワイヤーを作る"
     bl_description = "登録した髪すべてが対象。メッシュを切るので、写しのファイルで行ってください"
     bl_options = {"REGISTER", "UNDO"}
