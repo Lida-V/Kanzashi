@@ -1,8 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (c) 2026 Lida
-# SPDX-License-Identifier: GPL-3.0-or-later
-# Copyright (C) 2026 Lida
-# Prototype: give an existing hair mesh one guide wire per strand, so the strands can be bent by the wires.
+# Gives an existing hair mesh one guide wire per strand, so the strands can be bent by the wires.
 #   detect()        find strands in the mesh and build one wire (spline) for each
 #   bind_manual()   tie the mesh near a hand-made wire to that wire (soft falloff)
 #   ensure_deform() the modifier that moves bound vertices with their wire (identity until a wire is edited)

@@ -238,7 +238,6 @@ EN = {
     "UV マップ名は LW_StrandUV（元の UV はそのまま）": "UV map: LW_StrandUV (original kept)",
     "作った UV を選ぶ": "Strand UV",
     "元の UV に戻す": "Original UV",
-    "検査 OK": "Check OK",
     "髪を 1 つにまとめ、この UV だけで FBX に出す": "One mesh, this UV only, as FBX",
     "張り替え済み：%s": "Swapped: %s",
     "元の UV・材質に戻す": "Back to original UV & materials",

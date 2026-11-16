@@ -1,8 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (c) 2026 Lida
-# SPDX-License-Identifier: GPL-3.0-or-later
-# Copyright (C) 2026 Lida
-# Prototype: hair strands from guide wires, fitted to an existing (generated) hair mesh.
+# Hair strands from guide wires, fitted to an existing (generated) hair mesh.
 #   - ensure_group():   geometry-node group that turns a curve into a strand (flat -> tube -> pointed tip)
 #   - trace_strand():   from one point on an existing strand, follow it and return centre line + section sizes
 #   - fit_polyline():   re-centre a drawn line on the existing strand and read section sizes

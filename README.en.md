@@ -5,7 +5,7 @@
 A Blender tool that splits a generated hair mesh into strands, lets you fix the split by painting, bends each strand by a wire, and makes a UV map with one island per strand.
 It is made for hair that comes out of 3D generation services such as Tripo as one fused lump.
 
-- Version: 0.2.0 (prototype). This repository is private.
+- Version: 0.3.0 (prototype). This repository is private.
 - Tested with: Blender 5.3.0 on Windows 11. Other versions are untested.
 - Author: Lida
 - Panel languages: Japanese and English (see "Language" below).
@@ -25,15 +25,15 @@ It is made for hair that comes out of 3D generation services such as Tripo as on
 
 ## Install (add-on)
 
-1. Get `Kanzashi-addon-0.2.0.zip` (`python tools/build_packages.py` makes it in `dist/`).
-2. In Blender, open Edit > Preferences > Add-ons, choose "Install from Disk" in the menu at the top right, and pick the ZIP.
+1. Get `Kanzashi-addon-0.3.0.zip` (`python tools/build_packages.py` makes it in `dist/`).
+2. In Blender, open Edit > Preferences > Add-ons, choose "Install from Disk" in the menu at the top right, and pick the ZIP (it is installed as an extension).
 3. Enable "Kanzashi".
 4. Open the sidebar of the 3D viewport (N key). There is a "Kanzashi" tab.
 
 To try it without installing, start Blender like this; the panel is there for that session only.
 
 ```bash
-blender model.blend --python kanzashi/panel.py
+blender model.blend --python scripts/kanzashi_panel.py
 ```
 
 ## Language
@@ -70,7 +70,7 @@ The brush paints whole faces, so the size of the faces is the finest detail you 
 
 ## Without the panel (script)
 
-Unpack `Kanzashi-scripts-0.2.0.zip` and run it in the background. The opened file is not saved. It stops if the output already exists.
+Unpack `Kanzashi-scripts-0.3.0.zip` and run it in the background. The opened file is not saved. It stops if the output already exists.
 
 ```bash
 blender -b model.blend --python kanzashi_run.py -- --out model_kanzashi.blend --export hair.fbx --report report.json
@@ -108,13 +108,43 @@ Repainting, bending and swapping are functions of the panel (the add-on).
 ## Contents
 
 ```
-kanzashi/            the add-on (panel.py, the modules lida_hair_*.py, the two languages lida_hair_i18n.py)
-scripts/             the script that runs without the panel
+kanzashi/            the add-on
+  panel.py           the panel and the registration
+  ops_hair.py        1 registering hair, 2 detection
+  ops_paint.py       3 repainting
+  ops_bend.py        4 bending, 6 finishing and applying the shape
+  ops_uv.py          5 the strand UV, its check, the swap, the export
+  common.py          what those five share (viewport set-ups, picking and painting faces, handles)
+  i18n.py            the Japanese and English texts
+  tree.py            detection of the strands
+  edit.py            edits after the detection (applying the repaint, hiding strands, applying the shape)
+  strand_uv.py       the UV per strand and its check
+  swap.py            the swap and the export
+  strands.py rewire.py wire.py   the layer below detection and wires
+  blender_manifest.toml          the definition as an extension
+scripts/             the script that runs without the panel (kanzashi_run.py); the panel without installing (kanzashi_panel.py)
 tools/               makes the ZIP packages; checks that every panel text has an English one
+tests/               compares the results before and after a change of the code
 docs/                figure
 ```
 
 No models or textures are included.
+
+## Tests
+
+After a change of the code, compare the results with those from before on a hair file of your own (no models are in the repository). The opened file is not saved.
+
+```bash
+blender -b hair.blend --python tests/regress.py -- --out before.json
+```
+
+```bash
+python tests/compare.py before.json after.json
+```
+
+Nine steps are recorded as numbers and hashes: register, detect, repaint, bend, UV, check, swap and back, export, apply. Missing English texts: `python tools/check_i18n.py`. Style: `ruff check .` and `ruff format .`.
+
+Compatibility with files made by older versions: the mesh attributes (`lw_*`), the scene settings (`lida_hs_*`) and the names of modifiers and node groups are the same as in 0.1-0.2, so a file detected or repainted with those versions can be continued. What changed are the operator names (`lida.hs_*` -> `kanzashi.*`) and the module names.
 
 ## Licence
 

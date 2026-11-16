@@ -1,8 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (c) 2026 Lida
-# SPDX-License-Identifier: GPL-3.0-or-later
-# Copyright (C) 2026 Lida
-# Prototype, second design: strands are found from their tips and followed toward the root;
+# Strands found from their tips and followed toward the root;
 # the melted part near the crown is divided by flow lines of a smooth field, not vertex by vertex.
 #   find_tips()        dead ends of the surface (candidates for strand tips)
 #   trace_from_tip()   follow one strand from its tip toward the root, passing places where it only touches a neighbour

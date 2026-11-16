@@ -1,0 +1,18 @@
+schema_version = "1.0.0"
+
+id = "kanzashi"
+version = "0.3.0"
+name = "Kanzashi"
+tagline = "Hair strands of generated meshes: split, repaint, bend, UV"
+maintainer = "Lida"
+type = "add-on"
+
+blender_version_min = "5.3.0"
+
+license = ["SPDX:GPL-3.0-or-later"]
+copyright = ["2026 Lida"]
+
+tags = ["Mesh", "UV"]
+
+[permissions]
+files = "Exports the hair for texturing and remembers the panel language"

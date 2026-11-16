@@ -1,5 +1,17 @@
 # 変更履歴
 
+## 0.3.0（試作）
+
+動きは変えずに、コードを整理した。
+
+- モジュールを分けて名前を短くした（`panel`・`ops_hair`・`ops_paint`・`ops_bend`・`ops_uv`・`common`、`tree`・`edit`・`strand_uv`・`swap`・`strands`・`rewire`・`wire`・`i18n`）。パッケージの中は相対 import。
+- オペレーターの名前を `lida.hs_*` から `kanzashi.*` にした。メッシュの属性（`lw_*`）、シーンの設定（`lida_hs_*`）、モディファイアやノードグループの名前は変えていないので、0.2 までに作ったファイルはそのまま続きができる。
+- Blender の拡張機能の定義 `blender_manifest.toml` を足した。アドオンの ZIP は拡張機能として入る。
+- 入れずにパネルを出す起動は `scripts/kanzashi_panel.py` に変わった（`kanzashi/panel.py` を直接は実行できない）。スクリプト版の ZIP は、パッケージ `kanzashi/` を丸ごと含む。
+- 整理の前後で結果が同じかを比べる `tests/regress.py`・`tests/compare.py`。書き方は ruff で整えた（`ruff.toml`）。
+
+English: no change in behaviour. The code was split into smaller modules with relative imports, the operators were renamed to `kanzashi.*` (data names in files are unchanged, so older files keep working), an extension manifest was added, and the panel without installing is now started by `scripts/kanzashi_panel.py`.
+
 ## 0.2.0（試作）
 
 - パネルを日本語と英語で使えるようにした。いちばん上の欄で Auto／日本語／English を選ぶ（Auto は Blender の表示言語に合わせる）。

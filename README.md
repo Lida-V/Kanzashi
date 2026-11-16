@@ -7,7 +7,7 @@ Tripo などの 3D 生成サービスで作った、ひとかたまりの髪を�
 
 **Kanzashi — hair strand tool for Blender**: splits an AI-generated hair mesh into strands, lets you fix the split by painting, bends each strand by a wire, and makes a UV map per strand (check, export for texturing, swap).
 
-- 版：0.2.0（試作）。非公開のリポジトリです。
+- 版：0.3.0（試作）。非公開のリポジトリです。
 - 確かめた環境：Blender 5.3.0、Windows 11。ほかの版では試していません。
 - 作者：Lida
 - パネルの言語：日本語と英語（下の「言語」）
@@ -27,15 +27,15 @@ Tripo などの 3D 生成サービスで作った、ひとかたまりの髪を�
 
 ## 入れ方（アドオン）
 
-1. `Kanzashi-addon-0.2.0.zip` を用意します（`python tools/build_packages.py` で `dist/` に出来ます）。
-2. Blender の「編集 > プリファレンス > アドオン」の右上のメニューから「ディスクからインストール」を選び、ZIP を指定します。
+1. `Kanzashi-addon-0.3.0.zip` を用意します（`python tools/build_packages.py` で `dist/` に出来ます）。
+2. Blender の「編集 > プリファレンス > アドオン」の右上のメニューから「ディスクからインストール」を選び、ZIP を指定します（拡張機能として入ります）。
 3. 「Kanzashi」を有効にします。
 4. 3D ビューでサイドバー（N キー）を開くと、「Kanzashi」のタブがあります。
 
 入れずに試すだけなら、次のように起動すると、そのときだけパネルが出ます。
 
 ```bash
-blender model.blend --python kanzashi/panel.py
+blender model.blend --python scripts/kanzashi_panel.py
 ```
 
 ## 言語
@@ -70,7 +70,7 @@ blender model.blend --python kanzashi/panel.py
 
 ## パネルなしで動かす（スクリプト）
 
-`Kanzashi-scripts-0.2.0.zip` を展開して、背景実行で使います。開いたファイルは保存しません。出力先がすでにあると止まります。
+`Kanzashi-scripts-0.3.0.zip` を展開して、背景実行で使います。開いたファイルは保存しません。出力先がすでにあると止まります。
 
 ```bash
 blender -b model.blend --python kanzashi_run.py -- --out model_kanzashi.blend --export hair.fbx --report report.json
@@ -108,13 +108,43 @@ blender -b model.blend --python kanzashi_run.py -- --out model_kanzashi.blend --
 ## 中身
 
 ```
-kanzashi/            アドオン（パネル panel.py、計算のモジュール lida_hair_*.py、日英の文 lida_hair_i18n.py）
-scripts/             パネルなしで動かすスクリプト
+kanzashi/            アドオン
+  panel.py           パネルと登録
+  ops_hair.py        ① 髪の登録、② 検出
+  ops_paint.py       ③ 色の塗り直し
+  ops_bend.py        ④ 曲げる、⑥ 終わる・確定
+  ops_uv.py          ⑤ 毛束ごとの UV・検査・張り替え・書き出し
+  common.py          上の 5 つが共に使う処理（表示の切り替え、面を拾う・塗る、つまみ）
+  i18n.py            日本語と英語の文
+  tree.py            毛束の検出
+  edit.py            検出の後の編集（塗り直しの反映、毛束を隠す、形の確定）
+  strand_uv.py       毛束ごとの UV と検査
+  swap.py            張り替えと書き出し
+  strands.py rewire.py wire.py   検出とワイヤーの下の層
+  blender_manifest.toml          拡張機能としての定義
+scripts/             パネルなしで動かすスクリプト（kanzashi_run.py）、入れずにパネルを出すスクリプト（kanzashi_panel.py）
 tools/               配布用の ZIP を作るスクリプト、英語の文の抜けを調べるスクリプト
+tests/               整理の前後で結果が変わらないかを比べるテスト
 docs/                図
 ```
 
 モデル・テクスチャは入っていません。
+
+## テスト
+
+コードを直したら、直す前と同じ結果になるかを、手元の髪のファイルで比べます（モデルはリポジトリに入れていません）。開いたファイルは保存しません。
+
+```bash
+blender -b hair.blend --python tests/regress.py -- --out before.json
+```
+
+```bash
+python tests/compare.py before.json after.json
+```
+
+登録、検出、塗り直し、曲げ、UV、検査、張り替えと戻し、書き出し、確定の 9 段の結果を、数とハッシュで記録します。英語の文の抜けは `python tools/check_i18n.py`、書き方は `ruff check .` と `ruff format .` で調べます。
+
+古い版で作ったファイルとの互換：メッシュの属性（`lw_*`）、シーンの設定（`lida_hs_*`）、モディファイアやノードグループの名前は、0.1〜0.2 と同じです。0.2 までに検出・塗り直しをしたファイルは、そのまま続きができます。変えたのは、オペレーターの名前（`lida.hs_*` → `kanzashi.*`）とモジュールの名前だけです。
 
 ## ライセンス
 

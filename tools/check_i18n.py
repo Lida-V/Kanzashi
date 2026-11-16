@@ -1,50 +1,59 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (c) 2026 Lida
-"""Run: python tools/check_i18n.py
-Every Japanese text of the panel has an English one with the same % fields; no English text is unused."""
+"""Every Japanese text of the add-on has an English one with the same % fields, and no English text is unused.
+
+Run: python tools/check_i18n.py   (exit code 1 when something is wrong)"""
 
 import ast
+import glob
 import os
 import re
 import sys
 
-root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-JP = re.compile(r"[぀-ヿ一-鿿]")
-SPEC = re.compile(r"%(?:\.\d+)?[sdf%]")
-src = open(root + "/kanzashi/lida_hair_i18n.py", encoding="utf-8").read()
-EN = None
-for node in ast.parse(src).body:
-    if isinstance(node, ast.Assign) and node.targets[0].id == "EN":
-        EN = ast.literal_eval(node.value)
-used = set()
-bad = []
-for f in ("panel.py", "lida_hair_tree.py"):
-    tree = ast.parse(open(root + "/kanzashi/" + f, encoding="utf-8").read())
-    for node in ast.walk(tree):
-        if isinstance(node, ast.Constant) and isinstance(node.value, str) and JP.search(node.value):
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+JAPANESE = re.compile("[\\u3040-\\u30ff\\u4e00-\\u9fff\\uff00-\\uffef]")
+FIELD = re.compile(r"%(?:\.\d+)?[sdf%]")
+# words that are looked for in object names, and a marker that is compared as it is
+NOT_TEXTS = {"髪", "前髪", "毛", "飾", "検査 OK", "日本語"}
+
+
+def english_table():
+    src = open(os.path.join(ROOT, "kanzashi", "i18n.py"), encoding="utf-8").read()
+    for node in ast.parse(src).body:
+        if isinstance(node, ast.Assign) and getattr(node.targets[0], "id", "") == "EN":
+            return ast.literal_eval(node.value)
+    raise SystemExit("EN not found in kanzashi/i18n.py")
+
+
+def main():
+    en = english_table()
+    used = set()
+    bad = []
+    for path in sorted(glob.glob(os.path.join(ROOT, "kanzashi", "*.py"))):
+        name = os.path.basename(path)
+        if name == "i18n.py":
+            continue
+        for node in ast.walk(ast.parse(open(path, encoding="utf-8").read())):
+            if not (isinstance(node, ast.Constant) and isinstance(node.value, str) and JAPANESE.search(node.value)):
+                continue
             s = node.value
-            if (
-                s in ("髪", "前髪", "毛", "飾", "検査 OK")
-                or "\n" in s
-                or "パネルの言語" in s
-                or s == "日本語"
-                or "自動" in s
-                and "/" in s
-                or "Blender の表示言語" in s
-                and "/" in s
-            ):
+            if s in NOT_TEXTS or "\n" in s or " / " in s:  # docstrings and labels that are bilingual on purpose
                 continue
             used.add(s)
-            if s not in EN:
-                bad.append(("NO EN", f, s[:60]))
-            elif sorted(SPEC.findall(s)) != sorted(SPEC.findall(EN[s])):
-                bad.append(("SPEC", f, s[:60]))
-            if not EN.get(s, "x").isascii():
-                bad.append(("NOT ASCII", f, EN[s][:60]))
-unused = [k for k in EN if k not in used and k not in ("、", "。", "%s＝%s", "%s：%s", "検査 OK")]
-print("texts", len(used), "EN", len(EN), "problems", len(bad), "unused", len(unused))
-for b in bad:
-    print(b)
-for u in unused:
-    print("UNUSED", u[:60])
-sys.exit(1 if bad else 0)
+            if s not in en:
+                bad.append(("no English", name, s[:60]))
+            elif sorted(FIELD.findall(s)) != sorted(FIELD.findall(en[s])):
+                bad.append(("% fields differ", name, s[:60]))
+            elif not en[s].isascii():
+                bad.append(("English is not ASCII", name, en[s][:60]))
+    unused = [k for k in en if k not in used and k not in ("、", "。")]  # the separators
+    print("texts", len(used), "English", len(en), "problems", len(bad), "unused", len(unused))
+    for b in bad:
+        print(" ", *b)
+    for u in unused:
+        print("  unused:", u[:60])
+    return 1 if bad or unused else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
