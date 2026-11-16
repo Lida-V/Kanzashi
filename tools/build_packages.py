@@ -31,11 +31,11 @@ def build(name, entries):
 
 
 addon = [("kanzashi/" + f, os.path.join(ROOT, "kanzashi", f)) for f in sorted(os.listdir(os.path.join(ROOT, "kanzashi"))) if f.endswith(".py")]
-addon += [("kanzashi/LICENSE", os.path.join(ROOT, "LICENSE")), ("kanzashi/README.md", os.path.join(ROOT, "README.md"))]
+addon += [("kanzashi/LICENSE", os.path.join(ROOT, "LICENSE")), ("kanzashi/README.md", os.path.join(ROOT, "README.md")), ("kanzashi/README.en.md", os.path.join(ROOT, "README.en.md"))]
 build("Kanzashi-addon-%s.zip" % VERSION, addon)
 
 top = "Kanzashi-scripts-%s/" % VERSION
 scripts = [(top + "kanzashi_run.py", os.path.join(ROOT, "scripts", "kanzashi_run.py"))]
 scripts += [(top + "kanzashi_core/" + f, os.path.join(ROOT, "kanzashi", f)) for f in CORE]
-scripts += [(top + "LICENSE", os.path.join(ROOT, "LICENSE")), (top + "README.md", os.path.join(ROOT, "README.md"))]
+scripts += [(top + "LICENSE", os.path.join(ROOT, "LICENSE")), (top + "README.md", os.path.join(ROOT, "README.md")), (top + "README.en.md", os.path.join(ROOT, "README.en.md"))]
 build("Kanzashi-scripts-%s.zip" % VERSION, scripts)

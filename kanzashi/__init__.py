@@ -6,7 +6,7 @@ and makes a UV map per strand. Sidebar (N) > Kanzashi."""
 bl_info = {
     "name": "Kanzashi",
     "author": "Lida",
-    "version": (0, 1, 0),
+    "version": (0, 2, 0),
     "blender": (5, 3, 0),
     "location": "3D Viewport > Sidebar (N) > Kanzashi",
     "description": "Hair strands of generated meshes: detect, repaint, bend by wires, UV per strand",

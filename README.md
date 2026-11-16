@@ -1,13 +1,16 @@
 # Kanzashi（かんざし）
 
+日本語 | [English](README.en.md)
+
 生成した髪のメッシュを毛束ごとに分け、塗って直し、ワイヤーで曲げ、毛束ごとの UV まで作る Blender のツールです。
 Tripo などの 3D 生成サービスで作った、ひとかたまりの髪を扱いやすくするために作っています。
 
 **Kanzashi — hair strand tool for Blender**: splits an AI-generated hair mesh into strands, lets you fix the split by painting, bends each strand by a wire, and makes a UV map per strand (check, export for texturing, swap).
 
-- 版：0.1.0（試作）。非公開のリポジトリです。
+- 版：0.2.0（試作）。非公開のリポジトリです。
 - 確かめた環境：Blender 5.3.0、Windows 11。ほかの版では試していません。
 - 作者：Lida
+- パネルの言語：日本語と英語（下の「言語」）
 
 ![毛束ごとの UV の例](docs/strand_uv_example.jpg)
 
@@ -24,7 +27,7 @@ Tripo などの 3D 生成サービスで作った、ひとかたまりの髪を�
 
 ## 入れ方（アドオン）
 
-1. `Kanzashi-addon-0.1.0.zip` を用意します（`python tools/build_packages.py` で `dist/` に出来ます）。
+1. `Kanzashi-addon-0.2.0.zip` を用意します（`python tools/build_packages.py` で `dist/` に出来ます）。
 2. Blender の「編集 > プリファレンス > アドオン」の右上のメニューから「ディスクからインストール」を選び、ZIP を指定します。
 3. 「Kanzashi」を有効にします。
 4. 3D ビューでサイドバー（N キー）を開くと、「Kanzashi」のタブがあります。
@@ -34,6 +37,12 @@ Tripo などの 3D 生成サービスで作った、ひとかたまりの髪を�
 ```bash
 blender model.blend --python kanzashi/panel.py
 ```
+
+## 言語
+
+パネルのいちばん上の欄で言語を選べます。**Auto / 自動**（Blender の表示言語に合わせる。Blender が日本語なら日本語、ほかは英語）、**日本語**、**English**。
+選んだ言語は、Blender の設定フォルダの `kanzashi.json` に覚えます。
+パネルの文字はその場で変わります。Blender がアドオンの登録のときにだけ読む文字（元に戻す履歴に出る名前、ツールの名前）は、次に Blender を起動したときに変わります。
 
 ## 使う順番
 
@@ -61,7 +70,7 @@ blender model.blend --python kanzashi/panel.py
 
 ## パネルなしで動かす（スクリプト）
 
-`Kanzashi-scripts-0.1.0.zip` を展開して、背景実行で使います。開いたファイルは保存しません。出力先がすでにあると止まります。
+`Kanzashi-scripts-0.2.0.zip` を展開して、背景実行で使います。開いたファイルは保存しません。出力先がすでにあると止まります。
 
 ```bash
 blender -b model.blend --python kanzashi_run.py -- --out model_kanzashi.blend --export hair.fbx --report report.json
@@ -99,9 +108,9 @@ blender -b model.blend --python kanzashi_run.py -- --out model_kanzashi.blend --
 ## 中身
 
 ```
-kanzashi/            アドオン（パネル panel.py と、計算のモジュール lida_hair_*.py）
+kanzashi/            アドオン（パネル panel.py、計算のモジュール lida_hair_*.py、日英の文 lida_hair_i18n.py）
 scripts/             パネルなしで動かすスクリプト
-tools/               配布用の ZIP を作るスクリプト
+tools/               配布用の ZIP を作るスクリプト、英語の文の抜けを調べるスクリプト
 docs/                図
 ```
 

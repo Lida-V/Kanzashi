@@ -1286,9 +1286,9 @@ def strand_uv_auto(hair, wires_obj, name="LW_StrandUV", ok_share=0.01):
     tries = []; best = None
     for label, kw in (("tidy", dict(fold_cut=False)), ("cut folds", dict(fold_cut=True)),
                       ("cut folds, angle", dict(fold_cut=True, method="ANGLE_BASED"))):
-        _tell("UV を展開中（%d 回目）" % (len(tries) + 1), 0.05 + 0.25 * len(tries))
+        _tell(_tr("UV を展開中（%d 回目）") % (len(tries) + 1), 0.05 + 0.25 * len(tries))
         r = strand_uv2(hair, wires_obj, name=name, **kw)
-        _tell("重なりとつぶれを調べ中", 0.2 + 0.25 * len(tries)); tr = uv_trouble(hair, name)
+        _tell(_tr("重なりとつぶれを調べ中"), 0.2 + 0.25 * len(tries)); tr = uv_trouble(hair, name)
         tries.append(dict(way=label, islands=r["strips"], **tr))
         if best is None or tr["share"] < 0.7 * best[1]["share"]:       # more islands only for a real gain
             uv = np.empty(len(hair.data.loops) * 2, dtype=np.float32); hair.data.uv_layers[name].data.foreach_get("uv", uv)
@@ -1302,6 +1302,11 @@ def strand_uv_auto(hair, wires_obj, name="LW_StrandUV", ok_share=0.01):
 
 
 PROGRESS = None          # set by the panel: a function (text, share 0-1) called at the slow steps
+TRANSLATE = None         # set by the panel: gives a progress text in the language of the panel
+
+
+def _tr(text):
+    return TRANSLATE(text) if TRANSLATE is not None else text
 
 
 def _tell(text, share):
@@ -1619,7 +1624,7 @@ SWAP_TAG = "_LW"
 def _transfer_map(hairs, width, height, dst="LW_StrandUV"):
     """For every texel of the strand UV: where the same spot of the hair lies in the UV the hair is drawn with now.
     Two pictures (u and v), NaN where no face is; then grown a few texels past the islands' edges."""
-    _tell("写す位置を計算中", 0.1)
+    _tell(_tr("写す位置を計算中"), 0.1)
     U = np.full((height, width), np.nan, dtype=np.float32); V = U.copy()
     scale = np.array([width, height], dtype=np.float64)
     for h in hairs:
@@ -1725,7 +1730,7 @@ def swap_uv(hairs, name="LW_StrandUV", max_size=4096):
                             ow, oh = min(w, max_size), min(hh, max_size)
                             if (ow, oh) not in maps:
                                 maps[(ow, oh)] = _transfer_map(hairs, ow, oh, name)
-                            _tell("画像を写し中：%s" % img.name[:14], 0.2 + 0.1 * min(len(made), 6))
+                            _tell(_tr("画像を写し中：%s") % img.name[:14], 0.2 + 0.1 * min(len(made), 6))
                             px = np.empty(w * hh * 4, dtype=np.float32); img.pixels.foreach_get(px)
                             out = _resample(px.reshape(hh, w, 4), maps[(ow, oh)][0], maps[(ow, oh)][1])
                             ni = bpy.data.images.new(img.name + SWAP_TAG, ow, oh, alpha=True, float_buffer=img.is_float)
@@ -1737,7 +1742,7 @@ def swap_uv(hairs, name="LW_StrandUV", max_size=4096):
         h[SWAP_KEY] = json.dumps(before)
         befores[h.name] = before["render"]
         me.uv_layers[name].active_render = True; me.uv_layers.active = me.uv_layers[name]; me.update()
-    _tell("色の答え合わせ中", 0.9)
+    _tell(_tr("色の答え合わせ中"), 0.9)
     return dict(hairs=len(hairs), images=len([x for x in made.values() if x is not None]), skipped=sorted(set(skipped)),
                 materials=len(mats), **_swap_answer(hairs, made, befores, name))
 

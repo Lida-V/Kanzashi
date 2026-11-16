@@ -15,6 +15,10 @@ from mathutils import kdtree
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import lida_hair_strands as S  # noqa: E402
 import lida_hair_tree as TR  # noqa: E402
+import lida_hair_i18n as LANG  # noqa: E402
+
+T = LANG.T
+TR.TRANSLATE = T                # the progress texts of the slow steps
 
 R = S.R
 TOOL = "lida.hs_face_tool"
@@ -405,8 +409,8 @@ class LIDA_UL_hs_wires(bpy.types.UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         row = layout.row(align=True)
         sw = row.row(align=True); sw.ui_units_x = 1.6; sw.prop(item, "color", text="")
-        kind = {"base": "基準", "branch": "枝", "loose": "部品", "new": "新規"}.get(item.kind, item.kind)
-        row.label(text="%d  %s  %d 面" % (item.wire, kind, item.faces))
+        kind = {"base": T("基準"), "branch": T("枝"), "loose": T("部品"), "new": T("新規")}.get(item.kind, item.kind)
+        row.label(text=T("%d  %s  %d 面") % (item.wire, kind, item.faces))
         row.operator("lida.hs_solo", text="", icon="RESTRICT_SELECT_OFF", emboss=False).wire = item.wire
         row.operator("lida.hs_eye", text="", icon="HIDE_ON" if item.hidden else "HIDE_OFF", emboss=False).wire = item.wire
 
@@ -419,7 +423,7 @@ class LIDA_OT_hs_auto(bpy.types.Operator):
         n = sum(1 for o in context.view_layer.objects if o.visible_get() and looks_like_hair(o) and _add(context, o))
         if registered(context):
             only_hair(context, True)
-        self.report({"INFO"}, "登録 %d 個（合計 %d 個）。ほかの物は隠しました" % (n, len(registered(context))))
+        self.report({"INFO"}, T("登録 %d 個（合計 %d 個）。ほかの物は隠しました") % (n, len(registered(context))))
         return {"FINISHED"}
 
 
@@ -435,11 +439,11 @@ class LIDA_OT_hs_add(bpy.types.Operator):
         if new:
             if context.scene.get("lida_hs_hidden"):
                 only_hair(context, True)
-            self.report({"INFO"}, "足しました：" + "、".join(o.name for o in new))
+            self.report({"INFO"}, T("足しました：") + T("、").join(o.name for o in new))
         elif meshes:
-            self.report({"WARNING"}, "選んだメッシュはもう登録済みです")
+            self.report({"WARNING"}, T("選んだメッシュはもう登録済みです"))
         else:
-            self.report({"WARNING"}, "メッシュが選ばれていません。下の欄から名前で選んで足すこともできます")
+            self.report({"WARNING"}, T("メッシュが選ばれていません。下の欄から名前で選んで足すこともできます"))
         return {"FINISHED"}
 
 
@@ -465,7 +469,7 @@ class LIDA_OT_hs_isolate(bpy.types.Operator):
         if context.mode != "OBJECT":
             bpy.ops.object.mode_set(mode="OBJECT")
         n = only_hair(context, self.on)
-        self.report({"INFO"}, "隠している物 %d 個" % n)
+        self.report({"INFO"}, T("隠している物 %d 個") % n)
         return {"FINISHED"}
 
 
@@ -482,7 +486,7 @@ class LIDA_OT_hs_detect(bpy.types.Operator):
     def execute(self, context):
         hs = registered(context); sc = context.scene
         if not hs:
-            self.report({"ERROR"}, "先に ① で髪を登録してください"); return {"CANCELLED"}
+            self.report({"ERROR"}, T("先に ① で髪を登録してください")); return {"CANCELLED"}
         if context.mode != "OBJECT":
             bpy.ops.object.mode_set(mode="OBJECT")
         if sc.lida_hs_autotop:                      # the crown: the highest point of the registered hair
@@ -500,12 +504,12 @@ class LIDA_OT_hs_detect(bpy.types.Operator):
                 st = TR.detect_and_bind(hair, _wires(context, hair), tuple(sc.cursor.location), cap_len=sc.lida_hs_cap)
                 total += st["wires"]; TR.fill_strandless(hair.data)
             except Exception as e:
-                failed.append("%s：%s" % (hair.name, e))
+                failed.append(T("%s：%s") % (hair.name, e))
         TR.drop_unused_groups()
         only_hair(context, True); flat_colour_view(context); _trees.clear(); sync_list(context)
         if failed:
-            self.report({"ERROR"}, "失敗した物は曲げる仕組みを外しました。" + " / ".join(failed))
-        self.report({"INFO"}, "髪 %d 個、ワイヤー %d 本" % (len(hs) - len(failed), total))
+            self.report({"ERROR"}, T("失敗した物は曲げる仕組みを外しました。") + " / ".join(failed))
+        self.report({"INFO"}, T("髪 %d 個、ワイヤー %d 本") % (len(hs) - len(failed), total))
         return {"FINISHED"}
 
 
@@ -516,7 +520,7 @@ class LIDA_OT_hs_start(bpy.types.Operator):
     def execute(self, context):
         hair = _current(context)
         if not _detected(hair) or not enter_paint(context, hair):
-            self.report({"ERROR"}, "先に ② の検出を実行してください"); return {"CANCELLED"}
+            self.report({"ERROR"}, T("先に ② の検出を実行してください")); return {"CANCELLED"}
         if int(hair.get("lw_current", -1)) < 0:
             context.scene.lida_hs_mode = "PICK"
         context.scene.lida_hs_on = True
@@ -555,30 +559,30 @@ class LIDA_OT_hs_stroke(bpy.types.Operator):
             hair = _current(context); cur = int(hair.get("lw_current", -1)) if _detected(hair) else -1
             hit = cast(context, hair, *ray) if _detected(hair) else None
             if hit is None:
-                self.report({"WARNING"}, "髪の面に当たりませんでした"); return {"CANCELLED"}
+                self.report({"WARNING"}, T("髪の面に当たりませんでした")); return {"CANCELLED"}
             k2 = int(TR.face_strands(hair.data)[hit[1]])
             keep = {k2} | ({cur} if cur >= 0 else set())
             nw = len(_wires(context, hair).data.splines)
             TR.set_hidden(hair, [k for k in range(nw) if k not in keep]); _trees.clear(); sync_list(context, hair)
             sc.lida_hs_mode = "PAINT" if cur >= 0 else "PICK"
-            self.report({"INFO"}, "ワイヤー %s と %d だけ表示しています" % (cur if cur >= 0 else "-", k2))
+            self.report({"INFO"}, T("ワイヤー %s と %d だけ表示しています") % (cur if cur >= 0 else "-", k2))
             if context.area:
                 context.area.tag_redraw()
             return {"FINISHED"}
         if self.pick or sc.lida_hs_mode == "PICK":
             hair, k = pick_ray(context, *ray)
             if k < 0:
-                self.report({"WARNING"}, "検出済みの髪の面に当たりませんでした"); return {"CANCELLED"}
+                self.report({"WARNING"}, T("検出済みの髪の面に当たりませんでした")); return {"CANCELLED"}
             if context.active_object != hair:
                 enter_paint(context, hair)
             sc.lida_hs_mode = "PAINT"
-            self.report({"INFO"}, "ワイヤー %d の色を拾いました（ブラシに切り替え）" % k)
+            self.report({"INFO"}, T("ワイヤー %d の色を拾いました（ブラシに切り替え）") % k)
             if context.area:
                 context.area.tag_redraw()
             return {"FINISHED"}
         hair = _current(context)
         if not _detected(hair) or int(hair.get("lw_current", -1)) < 0:
-            self.report({"WARNING"}, "先にスポイトか一覧で色を選んでください"); return {"CANCELLED"}
+            self.report({"WARNING"}, T("先にスポイトか一覧で色を選んでください")); return {"CANCELLED"}
         _trees.clear()
         self._hair = hair.name; self._n = paint_ray(context, hair, ray[0], ray[1], sc.lida_hs_radius)
         self._last = (event.mouse_region_x, event.mouse_region_y)
@@ -608,7 +612,7 @@ class LIDA_OT_hs_stroke(bpy.types.Operator):
             if event.type == "LEFTMOUSE" and event.value == "PRESS":
                 return {"RUNNING_MODAL"}
             r = apply_hair(context, hair)
-            self.report({"INFO"}, "付け替えた面 %d" % r["faces_moved"])
+            self.report({"INFO"}, T("付け替えた面 %d") % r["faces_moved"])
             if context.area:
                 context.area.tag_redraw()
             return {"FINISHED"}
@@ -663,10 +667,10 @@ class LIDA_OT_hs_new(bpy.types.Operator):
     def execute(self, context):
         hair = _current(context)
         if not _detected(hair):
-            self.report({"ERROR"}, "先に ② の検出を実行してください"); return {"CANCELLED"}
+            self.report({"ERROR"}, T("先に ② の検出を実行してください")); return {"CANCELLED"}
         k = TR.new_wire(hair, _wires(context, hair))
         sync_list(context, hair); set_current(context, hair, k); context.scene.lida_hs_mode = "PAINT"
-        self.report({"INFO"}, "新しい色 %d を作りました。この色で面を塗ってください" % k)
+        self.report({"INFO"}, T("新しい色 %d を作りました。この色で面を塗ってください") % k)
         return {"FINISHED"}
 
 
@@ -785,13 +789,13 @@ class LIDA_OT_hs_bend(bpy.types.Operator):
             return {"FINISHED"}
         hair = _current(context)
         if not _detected(hair):
-            self.report({"ERROR"}, "先に ② の検出を実行してください"); return {"CANCELLED"}
+            self.report({"ERROR"}, T("先に ② の検出を実行してください")); return {"CANCELLED"}
         k = int(hair.get("lw_current", -1))
         if k < 0:
             k = int(np.argmax([f for _k, f, _kind in TR.wire_table(hair, _wires(context, hair))]))
             set_current(context, hair, k)
         made = start_bend(context, hair, k); flat_colour_view(context); sync_list(context, hair)
-        self.report({"INFO"}, "ワイヤー %d のつまみ %d 個を出しました。つまみをクリックして G で動かします" % (k, made))
+        self.report({"INFO"}, T("ワイヤー %d のつまみ %d 個を出しました。つまみをクリックして G で動かします") % (k, made))
         return {"FINISHED"}
 
 
@@ -831,7 +835,7 @@ class LIDA_OT_hs_bend_pick(bpy.types.Operator):
             return {"PASS_THROUGH"}
         if k != int(context.scene.get("lida_hs_bend_wire", -1)) or hair.name != context.scene.get("lida_hs_bend_hair"):
             start_bend(context, hair, k)
-        self.report({"INFO"}, "ワイヤー %d のつまみに切り替えました" % k)
+        self.report({"INFO"}, T("ワイヤー %d のつまみに切り替えました") % k)
         if context.area:
             context.area.tag_redraw()
         return {"FINISHED"}
@@ -853,10 +857,10 @@ class LIDA_OT_hs_escape(bpy.types.Operator):
                 if hidden:
                     TR.set_hidden(hair, []); _trees.clear(); sync_list(context, hair)
                 sc.lida_hs_mode = "PICK"
-                self.report({"INFO"}, "スポイトに戻しました（もう一度 Esc で、色を直すモードを終わります）")
+                self.report({"INFO"}, T("スポイトに戻しました（もう一度 Esc で、色を直すモードを終わります）"))
             else:
                 bpy.ops.lida.hs_stop()
-                self.report({"INFO"}, "色を直すモードを終わりました")
+                self.report({"INFO"}, T("色を直すモードを終わりました"))
             if context.area:
                 context.area.tag_redraw()
             return {"FINISHED"}
@@ -865,10 +869,10 @@ class LIDA_OT_hs_escape(bpy.types.Operator):
             if sel:
                 for g in sel:
                     g.select_set(False)
-                self.report({"INFO"}, "つまみの選択を外しました（もう一度 Esc で、曲げるモードを終わります）")
+                self.report({"INFO"}, T("つまみの選択を外しました（もう一度 Esc で、曲げるモードを終わります）"))
             else:
                 bpy.ops.lida.hs_bend(on=False)
-                self.report({"INFO"}, "曲げるモードを終わりました")
+                self.report({"INFO"}, T("曲げるモードを終わりました"))
             if context.area:
                 context.area.tag_redraw()
             return {"FINISHED"}
@@ -913,7 +917,7 @@ class LIDA_OT_hs_quit(bpy.types.Operator):
             for o in context.view_layer.objects:
                 o.select_set(o == hs[0])
             context.view_layer.objects.active = hs[0]
-        self.report({"INFO"}, "ツールを終わりました（表示を元に戻しました）")
+        self.report({"INFO"}, T("ツールを終わりました（表示を元に戻しました）"))
         return {"FINISHED"}
 
 
@@ -934,13 +938,13 @@ class LIDA_OT_hs_finalize(bpy.types.Operator):
                 continue
             try:
                 r = TR.finalize(h, bpy.data.objects.get(h.get("lw_wires", "")))
-                done.append("%s（最大 %.1f mm）" % (h.name, r["moved_mm"]))
+                done.append(T("%s（最大 %.1f mm）") % (h.name, r["moved_mm"]))
             except Exception as e:
-                failed.append("%s：%s" % (h.name, e))
+                failed.append(T("%s：%s") % (h.name, e))
         only_hair(context, False); context.scene.lida_hs_wires.clear()
         if failed:
-            self.report({"ERROR"}, "確定できなかった物：" + " / ".join(failed))
-        self.report({"INFO"}, "確定しました：" + ("、".join(done) if done else "なし"))
+            self.report({"ERROR"}, T("確定できなかった物：") + " / ".join(failed))
+        self.report({"INFO"}, T("確定しました：") + (T("、").join(done) if done else T("なし")))
         TR.drop_unused_groups()
         return {"FINISHED"}
 
@@ -955,7 +959,7 @@ class _BusyOp:
 
     def invoke(self, context, event):
         sc = context.scene; wm = context.window_manager
-        sc["lida_hs_busy"] = self.busy_text; sc["lida_hs_busy_pct"] = 0
+        sc["lida_hs_busy"] = T(self.busy_text); sc["lida_hs_busy_pct"] = 0
         context.window.cursor_modal_set("WAIT"); context.workspace.status_text_set(sc["lida_hs_busy"])
         for a in context.screen.areas:
             a.tag_redraw()
@@ -1010,7 +1014,7 @@ class LIDA_OT_hs_uvshow(bpy.types.Operator):
                 first = next((l for l in uvs if l.name != "LW_StrandUV"), None)
                 if first is not None:
                     uvs.active = first; n += 1
-        self.report({"INFO"}, "切り替えた髪 %d 個" % n)
+        self.report({"INFO"}, T("切り替えた髪 %d 個") % n)
         return {"FINISHED"}
 
 
@@ -1022,34 +1026,34 @@ class LIDA_OT_hs_uv(_BusyOp, bpy.types.Operator):
     def work(self, context):
         hs = [h for h in registered(context) if _detected(h)]
         if not hs:
-            self.report({"ERROR"}, "先に ② の検出を実行してください"); return {"CANCELLED"}
+            self.report({"ERROR"}, T("先に ② の検出を実行してください")); return {"CANCELLED"}
         if context.mode != "OBJECT":
             bpy.ops.object.mode_set(mode="OBJECT")
         back_on = context.scene.lida_hs_on
         if bending(context) or back_on:
             leave_modes(context)
         made = [TR.strand_uv_auto(h, _wires(context, h)) for h in hs]; n = sum(r["strips"] for r in made)
-        context.scene["lida_hs_uvways"] = "、".join("%s＝%s" % (h.name, r["way"]) for h, r in zip(hs, made))
+        context.scene["lida_hs_uvways"] = T("、").join(T("%s＝%s") % (h.name, r["way"]) for h, r in zip(hs, made))
         TR.pack_together(hs)                             # one 0-1 square for all the hairs (one texture)
-        TR._tell("UV を検査中", 0.85); c = TR.uv_check(hs); context.scene["lida_hs_uvcheck"] = _check_text(c)
-        self.report({"INFO"}, "島 %d 個（UV マップ LW_StrandUV。元の UV はそのまま）。%s" % (n, _check_text(c)))
+        TR._tell(T("UV を検査中"), 0.85); c = TR.uv_check(hs); context.scene["lida_hs_uvcheck"] = _check_text(c)
+        self.report({"INFO"}, T("島 %d 個（UV マップ LW_StrandUV。元の UV はそのまま）。%s") % (n, _check_text(c)))
         return {"FINISHED"}
 
 
 def _check_text(c):
-    extra = "。重なる面 %d・つぶれた面 %d（表面の %.2f %%）" % (c.get("folded_faces", 0), c.get("squashed_faces", 0), c.get("trouble_share", 0) * 100)
+    extra = T("。重なる面 %d・つぶれた面 %d（表面の %.2f %%）") % (c.get("folded_faces", 0), c.get("squashed_faces", 0), c.get("trouble_share", 0) * 100)
     if c["ok"]:
-        return "検査 OK：0〜1 の中・島の重なりなし・島の間 %d px 以上" % c["gap"] + extra
+        return T("検査 OK：0〜1 の中・島の重なりなし・島の間 %d px 以上") % c["gap"] + extra
     bad = []
     if c.get("trouble_share", 0) > 0.02:
-        bad.append("重なる面・つぶれた面が多い（表面の %.1f %%）" % (c["trouble_share"] * 100))
+        bad.append(T("重なる面・つぶれた面が多い（表面の %.1f %%）") % (c["trouble_share"] * 100))
     if not c["inside_0_1"]:
-        bad.append("0〜1 の外に出ている")
+        bad.append(T("0〜1 の外に出ている"))
     if c["overlap_pixels"]:
-        bad.append("重なり %d px" % c["overlap_pixels"])
+        bad.append(T("重なり %d px") % c["overlap_pixels"])
     if c["too_close_pixels"]:
-        bad.append("島が近すぎる所 %d px" % c["too_close_pixels"])
-    return "検査 NG：" + "、".join(bad)
+        bad.append(T("島が近すぎる所 %d px") % c["too_close_pixels"])
+    return T("検査 NG：") + T("、").join(bad)
 
 
 class LIDA_OT_hs_uvswap(_BusyOp, bpy.types.Operator):
@@ -1064,19 +1068,21 @@ class LIDA_OT_hs_uvswap(_BusyOp, bpy.types.Operator):
         if bending(context) or context.scene.lida_hs_on:
             leave_modes(context)
         if not self.on:
-            n_ = TR.revert_uv(hs); self.report({"INFO"}, "元の UV・材質に戻しました（髪 %d 個）" % n_); return {"FINISHED"}
+            n_ = TR.revert_uv(hs); self.report({"INFO"}, T("元の UV・材質に戻しました（髪 %d 個）") % n_); return {"FINISHED"}
         if not hs:
-            self.report({"ERROR"}, "先に「毛束ごとの UV を作る」を押してください"); return {"CANCELLED"}
-        TR._tell("UV を検査中", 0.85); c = TR.uv_check(hs); context.scene["lida_hs_uvcheck"] = _check_text(c)
+            self.report({"ERROR"}, T("先に「毛束ごとの UV を作る」を押してください")); return {"CANCELLED"}
+        TR._tell(T("UV を検査中"), 0.85); c = TR.uv_check(hs); context.scene["lida_hs_uvcheck"] = _check_text(c)
         if not c["ok"]:
-            self.report({"ERROR"}, _check_text(c) + "。「毛束ごとの UV を作る」を押し直してください"); return {"CANCELLED"}
+            self.report({"ERROR"}, _check_text(c) + T("。「毛束ごとの UV を作る」を押し直してください")); return {"CANCELLED"}
         r = TR.swap_uv(hs)
-        msg = "張り替えました：髪 %d 個、写した画像 %d 枚、材質の写し %d 個" % (r["hairs"], r["images"], r.get("materials", 0))
+        msg = T("張り替えました：髪 %d 個、写した画像 %d 枚、材質の写し %d 個") % (r["hairs"], r["images"], r.get("materials", 0))
+        check = ""
         if r.get("triangles"):
-            msg += "。色の答え合わせ：%d 個中 %d 個の三角形で色が違う（%.2f %%）" % (r["triangles"], r["differ"], 100.0 * r["differ"] / r["triangles"])
-        context.scene["lida_hs_swapcheck"] = msg
+            check = T("色の答え合わせ：%d 個中 %d 個の三角形で色が違う（%.2f %%）") % (r["triangles"], r["differ"], 100.0 * r["differ"] / r["triangles"])
+            msg += T("。") + check
+        context.scene["lida_hs_swapcheck"] = check
         if r["skipped"]:
-            self.report({"WARNING"}, msg + "。写せなかった画像：" + "、".join(r["skipped"]))
+            self.report({"WARNING"}, msg + T("。写せなかった画像：") + T("、").join(r["skipped"]))
         else:
             self.report({"INFO"}, msg)
         return {"FINISHED"}
@@ -1091,7 +1097,7 @@ class LIDA_OT_hs_uvdrop(bpy.types.Operator):
 
     def execute(self, context):
         gone = TR.drop_old_uv(registered(context))
-        self.report({"INFO"}, "消した UV：%s" % ("、".join(gone) if gone else "なし（張り替え済みの髪がありません）"))
+        self.report({"INFO"}, T("消した UV：%s") % (T("、").join(gone) if gone else T("なし（張り替え済みの髪がありません）")))
         return {"FINISHED"}
 
 
@@ -1112,18 +1118,18 @@ class LIDA_OT_hs_export(bpy.types.Operator):
     def execute(self, context):
         hs = [h for h in registered(context) if _detected(h) and "LW_StrandUV" in h.data.uv_layers]
         if not hs:
-            self.report({"ERROR"}, "先に「毛束ごとの UV を作る」を押してください"); return {"CANCELLED"}
+            self.report({"ERROR"}, T("先に「毛束ごとの UV を作る」を押してください")); return {"CANCELLED"}
         if bending(context) or context.scene.lida_hs_on:
             leave_modes(context)
-        TR._tell("UV を検査中", 0.85); c = TR.uv_check(hs); context.scene["lida_hs_uvcheck"] = _check_text(c)
+        TR._tell(T("UV を検査中"), 0.85); c = TR.uv_check(hs); context.scene["lida_hs_uvcheck"] = _check_text(c)
         if not c["ok"]:
-            self.report({"ERROR"}, _check_text(c) + "。「毛束ごとの UV を作る」を押し直してください"); return {"CANCELLED"}
+            self.report({"ERROR"}, _check_text(c) + T("。「毛束ごとの UV を作る」を押し直してください")); return {"CANCELLED"}
         path = bpy.path.abspath(self.filepath)
         if not path.lower().endswith((".fbx", ".glb")):
             path += ".fbx"
         info = TR.export_for_texture(hs, path)
         mb = info["bytes"] / 1048576.0
-        self.report({"WARNING"} if mb > 150 else {"INFO"}, "書き出し：%s（%.1f MB、面 %d）%s" % (path, mb, info["faces"], "。150 MB を超えています" if mb > 150 else ""))
+        self.report({"WARNING"} if mb > 150 else {"INFO"}, T("書き出し：%s（%.1f MB、面 %d）%s") % (path, mb, info["faces"], T("。150 MB を超えています") if mb > 150 else ""))
         return {"FINISHED"}
 
 
@@ -1145,142 +1151,144 @@ class LIDA_PT_hs(bpy.types.Panel):
 
     def draw(self, context):
         lay = self.layout; sc = context.scene
+        row = lay.row(align=True); row.alignment = "RIGHT"
+        row.prop(context.window_manager, "lida_hs_lang", text="", icon="WORLD")
         hs = registered(context); det = [h for h in hs if _detected(h)]
         if sc.get("lida_hs_busy"):
             box = lay.box(); box.alert = True
-            box.label(text="処理中（%d %%）。待ってください" % sc.get("lida_hs_busy_pct", 0), icon="TIME")
+            box.label(text=T("処理中（%d %%）。待ってください") % sc.get("lida_hs_busy_pct", 0), icon="TIME")
             box.label(text=sc["lida_hs_busy"])
         hair = _current(context); painting = sc.lida_hs_on and context.mode == "PAINT_VERTEX" and _detected(context.active_object)
         if not hs:
-            nxt = "① の「自動で登録」を押す"
+            nxt = T("① の「自動で登録」を押す")
         elif not det:
-            nxt = "② の「毛束を検出」を押す"
+            nxt = T("② の「毛束を検出」を押す")
         elif not painting:
-            nxt = "③ の「色を直すモードに入る」（検出はもう不要）"
+            nxt = T("③ の「色を直すモードに入る」（検出はもう不要）")
         elif int(hair.get("lw_current", -1)) < 0:
-            nxt = "スポイトで、合わせたい色の面をクリック"
+            nxt = T("スポイトで、合わせたい色の面をクリック")
         else:
-            nxt = "色の違う所をなぞる（戻すのは Ctrl+Z）"
-        box = lay.box(); box.alert = True; box.label(text="次：" + nxt, icon="INFO")
+            nxt = T("色の違う所をなぞる（戻すのは Ctrl+Z）")
+        box = lay.box(); box.alert = True; box.label(text=T("次：") + nxt, icon="INFO")
 
-        box = lay.box(); box.label(text="① 対象の髪を決める", icon="OUTLINER_OB_MESH")
+        box = lay.box(); box.label(text=T("① 対象の髪を決める"), icon="OUTLINER_OB_MESH")
         row = box.row(align=True)
-        row.operator("lida.hs_auto", text="自動で登録", icon="VIEWZOOM")
-        row.operator("lida.hs_add", text="選択を足す", icon="ADD")
+        row.operator("lida.hs_auto", text=T("自動で登録"), icon="VIEWZOOM")
+        row.operator("lida.hs_add", text=T("選択を足す"), icon="ADD")
         for i, it in enumerate(sc.lida_hs_list):
             row = box.row(align=True)
             if it.obj is None:
-                row.label(text="（消えた物体）", icon="ERROR")
+                row.label(text=T("（消えた物体）"), icon="ERROR")
             else:
                 row.label(text=it.obj.name, icon="CHECKMARK" if _detected(it.obj) else "MESH_DATA")
             row.operator("lida.hs_remove", text="", icon="X").index = i
-        box.prop(sc, "lida_hs_pick_add", text="名前で足す")
+        box.prop(sc, "lida_hs_pick_add", text=T("名前で足す"))
         row = box.row(align=True)
-        row.operator("lida.hs_isolate", text="髪だけ表示", icon="HIDE_ON").on = True
-        row.operator("lida.hs_isolate", text="隠した物を戻す", icon="HIDE_OFF").on = False
+        row.operator("lida.hs_isolate", text=T("髪だけ表示"), icon="HIDE_ON").on = True
+        row.operator("lida.hs_isolate", text=T("隠した物を戻す"), icon="HIDE_OFF").on = False
 
-        box = lay.box(); box.label(text="② 毛束を検出する", icon="OUTLINER_OB_CURVES"); box.enabled = bool(hs)
-        box.prop(sc, "lida_hs_autotop", text="頭頂を自動で決める（いちばん高い点）")
+        box = lay.box(); box.label(text=T("② 毛束を検出する"), icon="OUTLINER_OB_CURVES"); box.enabled = bool(hs)
+        box.prop(sc, "lida_hs_autotop", text=T("頭頂を自動で決める（いちばん高い点）"))
         if not sc.lida_hs_autotop:
-            box.label(text="3D カーソルを頭頂に置いてから押す")
+            box.label(text=T("3D カーソルを頭頂に置いてから押す"))
         if det:
             col = box.column(align=True)
-            col.label(text="検出済み：%s" % "、".join(h.name for h in det), icon="CHECKMARK")
-            col.label(text="続きの編集は、検出せずに ③ へ進む")
+            col.label(text=T("検出済み：%s") % T("、").join(h.name for h in det), icon="CHECKMARK")
+            col.label(text=T("続きの編集は、検出せずに ③ へ進む"))
             col.alert = True
-            col.label(text="もう一度検出すると、塗り直しと", icon="ERROR")
-            col.label(text="曲げた形が作り直されて消えます")
-            box.operator("lida.hs_detect", text="検出をやり直す（確認が出ます）")
+            col.label(text=T("もう一度検出すると、塗り直しと"), icon="ERROR")
+            col.label(text=T("曲げた形が作り直されて消えます"))
+            box.operator("lida.hs_detect", text=T("検出をやり直す（確認が出ます）"))
         else:
-            box.operator("lida.hs_detect", text="毛束を検出（1 本ごとに色が付く）")
-        box.label(text="写しのファイルで行う（メッシュを切ります）")
+            box.operator("lida.hs_detect", text=T("毛束を検出（1 本ごとに色が付く）"))
+        box.label(text=T("写しのファイルで行う（メッシュを切ります）"))
 
-        box = lay.box(); box.label(text="③ 色の違う所を直す", icon="BRUSH_DATA"); box.enabled = bool(det)
+        box = lay.box(); box.label(text=T("③ 色の違う所を直す"), icon="BRUSH_DATA"); box.enabled = bool(det)
         if not painting:
-            box.operator("lida.hs_start", icon="PLAY")
+            box.operator("lida.hs_start", text=T(LIDA_OT_hs_start._ja[0]), icon="PLAY")
         else:
-            box.operator("lida.hs_stop", icon="PAUSE")
+            box.operator("lida.hs_stop", text=T(LIDA_OT_hs_stop._ja[0]), icon="PAUSE")
             row = box.row(align=True); row.scale_y = 1.4
-            row.prop_enum(sc, "lida_hs_mode", "PICK", text="スポイト", icon="EYEDROPPER")
-            row.prop_enum(sc, "lida_hs_mode", "PAINT", text="ブラシ", icon="BRUSH_DATA")
+            row.prop_enum(sc, "lida_hs_mode", "PICK", text=T("スポイト"), icon="EYEDROPPER")
+            row.prop_enum(sc, "lida_hs_mode", "PAINT", text=T("ブラシ"), icon="BRUSH_DATA")
             row = box.row(align=True); row.scale_y = 1.2
-            row.prop_enum(sc, "lida_hs_mode", "FOCUS", text="塗りたい相手をクリック → 2 色だけ表示", icon="ZOOM_SELECTED")
+            row.prop_enum(sc, "lida_hs_mode", "FOCUS", text=T("塗りたい相手をクリック → 2 色だけ表示"), icon="ZOOM_SELECTED")
             row.operator("lida.hs_eye", text="", icon="HIDE_OFF").wire = -1
             row = box.row(align=True)
-            row.prop(sc, "lida_hs_radius", text="ブラシの太さ")
+            row.prop(sc, "lida_hs_radius", text=T("ブラシの太さ"))
             row.operator("lida.hs_size", text="", icon="REMOVE").factor = 0.8
             row.operator("lida.hs_size", text="", icon="ADD").factor = 1.25
-            box.label(text="[ ] キーでも太さを変えられます。面 1 枚が最小です")
+            box.label(text=T("[ ] キーでも太さを変えられます。面 1 枚が最小です"))
             col = box.column(align=True)
-            col.label(text="スポイト：面をクリックで色を拾う")
-            col.label(text="ブラシ：なぞった面がその色になる")
-            col.label(text="Ctrl+クリックはいつでもスポイト")
-            col.label(text="Shift+クリック：今の色とその色だけ表示")
-            col.label(text="戻す Ctrl+Z／やり直す Ctrl+Shift+Z")
-            col.label(text="Esc：スポイトへ戻る → もう一度で終わる")
-            col.label(text="左のツールバーの筆は使いません", icon="ERROR")
+            col.label(text=T("スポイト：面をクリックで色を拾う"))
+            col.label(text=T("ブラシ：なぞった面がその色になる"))
+            col.label(text=T("Ctrl+クリックはいつでもスポイト"))
+            col.label(text=T("Shift+クリック：今の色とその色だけ表示"))
+            col.label(text=T("戻す Ctrl+Z／やり直す Ctrl+Shift+Z"))
+            col.label(text=T("Esc：スポイトへ戻る → もう一度で終わる"))
+            col.label(text=T("左のツールバーの筆は使いません"), icon="ERROR")
         if det and hair is not None:
             cur = int(hair.get("lw_current", -1))
-            box.label(text="色の一覧（%s）　今の色：%s" % (hair.name, cur if cur >= 0 else "なし"))
+            box.label(text=T("色の一覧（%s）　今の色：%s") % (hair.name, cur if cur >= 0 else T("なし")))
             box.template_list("LIDA_UL_hs_wires", "", sc, "lida_hs_wires", sc, "lida_hs_wire_index", rows=8)
             row = box.row(align=True)
-            row.operator("lida.hs_eye", text="全部表示", icon="HIDE_OFF").wire = -1
-            row.operator("lida.hs_new", text="新しい色を足す", icon="ADD")
-            box.label(text="行をクリック：その色を選ぶ／目：隠す／矢印：その色だけ")
+            row.operator("lida.hs_eye", text=T("全部表示"), icon="HIDE_OFF").wire = -1
+            row.operator("lida.hs_new", text=T("新しい色を足す"), icon="ADD")
+            box.label(text=T("行をクリック：その色を選ぶ／目：隠す／矢印：その色だけ"))
 
-        box = lay.box(); box.label(text="④ ワイヤーで髪を曲げる", icon="CURVE_BEZCURVE"); box.enabled = bool(det)
+        box = lay.box(); box.label(text=T("④ ワイヤーで髪を曲げる"), icon="CURVE_BEZCURVE"); box.enabled = bool(det)
         editing = bool(sc.get("lida_hs_grips"))
         if not editing:
-            box.operator("lida.hs_bend", icon="PLAY").on = True
-            box.label(text="押した後、曲げたい毛束の面をクリック")
+            box.operator("lida.hs_bend", text=T(LIDA_OT_hs_bend._ja[0]), icon="PLAY").on = True
+            box.label(text=T("押した後、曲げたい毛束の面をクリック"))
         else:
-            box.label(text="ワイヤー %d を曲げています" % int(sc.get("lida_hs_bend_wire", -1)))
+            box.label(text=T("ワイヤー %d を曲げています") % int(sc.get("lida_hs_bend_wire", -1)))
             col = box.column(align=True)
-            col.label(text="丸いつまみをクリックして G で動かす")
-            col.label(text="髪の面か一覧をクリック：その毛束に切り替え")
-            col.label(text="Esc：選択を外す → もう一度で終わる")
-            col.label(text="Shift+クリックで複数選べます")
-            col.label(text="根元の 5 cm は動きません（その先が曲がる）")
-            col.label(text="色の一覧の目・矢印で、見せる毛束を絞れます")
-            box.operator("lida.hs_bend", text="曲げ終わる（つまみを消す）", icon="PAUSE").on = False
+            col.label(text=T("丸いつまみをクリックして G で動かす"))
+            col.label(text=T("髪の面か一覧をクリック：その毛束に切り替え"))
+            col.label(text=T("Esc：選択を外す → もう一度で終わる"))
+            col.label(text=T("Shift+クリックで複数選べます"))
+            col.label(text=T("根元の 5 cm は動きません（その先が曲がる）"))
+            col.label(text=T("色の一覧の目・矢印で、見せる毛束を絞れます"))
+            box.operator("lida.hs_bend", text=T("曲げ終わる（つまみを消す）"), icon="PAUSE").on = False
 
-        box = lay.box(); box.label(text="⑤ 毛束ごとの UV", icon="UV"); box.enabled = bool(det)
-        box.operator("lida.hs_uv")
-        box.label(text="数十秒かかります（進み具合が上に出ます）")
+        box = lay.box(); box.label(text=T("⑤ 毛束ごとの UV"), icon="UV"); box.enabled = bool(det)
+        box.operator("lida.hs_uv", text=T(LIDA_OT_hs_uv._ja[0]))
+        box.label(text=T("数十秒かかります（進み具合が上に出ます）"))
         have = [h.name for h in det if "LW_StrandUV" in h.data.uv_layers]
         if have:
-            box.label(text="作成済み：%s" % "、".join(have), icon="CHECKMARK")
-            box.label(text="UV マップ名は LW_StrandUV（元の UV はそのまま）")
+            box.label(text=T("作成済み：%s") % T("、").join(have), icon="CHECKMARK")
+            box.label(text=T("UV マップ名は LW_StrandUV（元の UV はそのまま）"))
             row = box.row(align=True)
-            row.operator("lida.hs_uvshow", text="作った UV を選ぶ").strand = True
-            row.operator("lida.hs_uvshow", text="元の UV に戻す").strand = False
+            row.operator("lida.hs_uvshow", text=T("作った UV を選ぶ")).strand = True
+            row.operator("lida.hs_uvshow", text=T("元の UV に戻す")).strand = False
             chk = sc.get("lida_hs_uvcheck", "")
             if chk:
-                box.label(text=chk, icon="CHECKMARK" if chk.startswith("検査 OK") else "ERROR")
-            box.operator("lida.hs_export", icon="EXPORT")
-            box.label(text="髪を 1 つにまとめ、この UV だけで FBX に出す")
+                box.label(text=chk, icon="CHECKMARK" if chk.startswith(("検査 OK", "Check OK")) else "ERROR")
+            box.operator("lida.hs_export", text=T(LIDA_OT_hs_export._ja[0]), icon="EXPORT")
+            box.label(text=T("髪を 1 つにまとめ、この UV だけで FBX に出す"))
             swapped = [h.name for h in det if h.get(TR.SWAP_KEY)]
             col = box.column(align=True)
             if swapped:
-                col.label(text="張り替え済み：%s" % "、".join(swapped), icon="CHECKMARK")
-                if r"色の答え合わせ" in sc.get("lida_hs_swapcheck", ""):
-                    col.label(text=sc["lida_hs_swapcheck"].split("。")[-1])
-                col.operator("lida.hs_uvswap", text="元の UV・材質に戻す", icon="LOOP_BACK").on = False
+                col.label(text=T("張り替え済み：%s") % T("、").join(swapped), icon="CHECKMARK")
+                if sc.get("lida_hs_swapcheck", ""):
+                    col.label(text=sc["lida_hs_swapcheck"])
+                col.operator("lida.hs_uvswap", text=T("元の UV・材質に戻す"), icon="LOOP_BACK").on = False
             else:
-                col.operator("lida.hs_uvswap", text="この UV に張り替える（見た目はそのまま）", icon="UV_SYNC_SELECT").on = True
-                col.label(text="今のテクスチャを新しい UV へ写します")
+                col.operator("lida.hs_uvswap", text=T("この UV に張り替える（見た目はそのまま）"), icon="UV_SYNC_SELECT").on = True
+                col.label(text=T("今のテクスチャを新しい UV へ写します"))
         else:
-            box.label(text="まだ作っていません")
+            box.label(text=T("まだ作っていません"))
 
-        box = lay.box(); box.label(text="⑥ 終わる", icon="CHECKMARK")
-        box.operator("lida.hs_quit", icon="PAUSE")
-        box.label(text="表示を元に戻す。後で続きができます")
+        box = lay.box(); box.label(text=T("⑥ 終わる"), icon="CHECKMARK")
+        box.operator("lida.hs_quit", text=T(LIDA_OT_hs_quit._ja[0]), icon="PAUSE")
+        box.label(text=T("表示を元に戻す。後で続きができます"))
         if any(h.get(TR.SWAP_KEY) for h in det):
             sub = box.column(); sub.alert = True
-            sub.operator("lida.hs_uvdrop", icon="TRASH")
+            sub.operator("lida.hs_uvdrop", text=T(LIDA_OT_hs_uvdrop._ja[0]), icon="TRASH")
         sub = box.column(); sub.enabled = bool(det)
-        sub.operator("lida.hs_finalize", icon="LOCKED")
-        sub.label(text="形をメッシュに書き込み、ワイヤーを外す")
+        sub.operator("lida.hs_finalize", text=T(LIDA_OT_hs_finalize._ja[0]), icon="LOCKED")
+        sub.label(text=T("形をメッシュに書き込み、ワイヤーを外す"))
 
 
 CLASSES = (LidaHsItem, LidaHsWire, LIDA_UL_hs_wires, LIDA_OT_hs_auto, LIDA_OT_hs_add, LIDA_OT_hs_remove, LIDA_OT_hs_isolate,
@@ -1288,9 +1296,40 @@ CLASSES = (LidaHsItem, LidaHsWire, LIDA_UL_hs_wires, LIDA_OT_hs_auto, LIDA_OT_hs
            LIDA_OT_hs_new, LIDA_OT_hs_size, LIDA_OT_hs_bend, LIDA_OT_hs_bend_pick, LIDA_OT_hs_escape, LIDA_OT_hs_quit, LIDA_OT_hs_finalize, LIDA_OT_hs_uvshow, LIDA_OT_hs_uv, LIDA_OT_hs_uvswap, LIDA_OT_hs_uvdrop, LIDA_OT_hs_export, LIDA_PT_hs)
 
 
+def _tip(cls, context, properties):
+    return T(cls._ja[1])
+
+
+def _localize():
+    """The labels and tooltips that Blender reads once, at registration, in the language in use now. The Japanese
+    originals are kept in _ja; operator tooltips are also answered live (description), so they follow a later switch."""
+    for c in CLASSES + (LidaHsFaceTool,):
+        if "_ja" not in c.__dict__:
+            c._ja = (c.__dict__.get("bl_label", ""), c.__dict__.get("bl_description", ""))
+        if c._ja[0]:
+            c.bl_label = T(c._ja[0])
+        if c._ja[1]:
+            c.bl_description = T(c._ja[1])
+            if issubclass(c, bpy.types.Operator):
+                c.description = classmethod(_tip)
+
+
+def _lang_changed(self, context):
+    LANG.set_choice(self.lida_hs_lang)
+    for w in context.window_manager.windows:
+        for a in w.screen.areas:
+            a.tag_redraw()
+
+
 def register():
+    _localize()
     for c in CLASSES:
         bpy.utils.register_class(c)
+    bpy.types.WindowManager.lida_hs_lang = bpy.props.EnumProperty(
+        name="Language", description="Language of the Kanzashi panel / パネルの言語",
+        items=(("AUTO", "Auto / 自動", "Follows Blender's interface language / Blender の表示言語に合わせる"),
+               ("JA", "日本語", "Japanese"), ("EN", "English", "English")),
+        default=LANG.choice(), update=_lang_changed)
     sc = bpy.types.Scene
     sc.lida_hs_list = bpy.props.CollectionProperty(type=LidaHsItem)
     sc.lida_hs_wires = bpy.props.CollectionProperty(type=LidaHsWire)
@@ -1300,9 +1339,9 @@ def register():
     sc.lida_hs_radius = bpy.props.FloatProperty(default=0.008, min=0.001, max=0.2, soft_min=0.001, soft_max=0.04,
                                                  step=0.05, precision=4, subtype="DISTANCE")
     sc.lida_hs_autotop = bpy.props.BoolProperty(default=True)
-    sc.lida_hs_mode = bpy.props.EnumProperty(items=(("PICK", "スポイト", "クリックした面の色を拾う"),
-                                                    ("PAINT", "ブラシ", "なぞった面を今の色にする"),
-                                                    ("FOCUS", "2 色だけ", "クリックした面の色と今の色だけを表示する")), default="PICK")
+    sc.lida_hs_mode = bpy.props.EnumProperty(items=(("PICK", T("スポイト"), T("クリックした面の色を拾う")),
+                                                    ("PAINT", T("ブラシ"), T("なぞった面を今の色にする")),
+                                                    ("FOCUS", T("2 色だけ"), T("クリックした面の色と今の色だけを表示する"))), default="PICK")
     sc.lida_hs_on = bpy.props.BoolProperty(default=False)
     sc.lida_hs_pick_add = bpy.props.PointerProperty(type=bpy.types.Object, poll=lambda s, o: o.type == "MESH", update=_picked_to_add)
     try:
@@ -1349,6 +1388,7 @@ def unregister():
             pass
     _keys.clear()
     del bpy.types.Scene.lida_hs_on, bpy.types.Scene.lida_hs_pick_add
+    del bpy.types.WindowManager.lida_hs_lang
     sc = bpy.types.Scene
     del sc.lida_hs_list, sc.lida_hs_wires, sc.lida_hs_wire_index, sc.lida_hs_hair, sc.lida_hs_cap, sc.lida_hs_radius
     del sc.lida_hs_autotop, sc.lida_hs_mode
