@@ -23,7 +23,8 @@ Do not use it when the hair is already separate strand parts, when it is made of
 - **Do not detect again on a file the user has repainted or bent.** `kanzashi_run.py` keeps the strands of a hair that is already detected. Use `--redetect` only when the user says "start over".
 - **Install or update the add-on only with the user's permission.**
 - Do not call it done on numbers alone. Whether the split is good is decided by the user looking at the pictures.
-- Painting strand colours and bending wires are done by the user in Blender. The agent does not paint for them (which face belongs to which strand is a visual judgement).
+- Painting strand colours is done by the user in Blender. The agent does not paint for them (which face belongs to which strand is a visual judgement).
+- Bending wires is the user's work too, as a rule. The agent moves wires only to fix strands inside the body, after stating its plan and being told "fix them by the AI's plan", and has the result confirmed with pictures (step 5).
 
 ## The steps, and where to ask the user
 
@@ -104,7 +105,59 @@ Check that `hairs[].kept_strands` is true. Make the pictures again (step 2).
 
 ★ Show them and ask "Are the strands and the shape final?" If not, go back to step 3.
 
-### 5. What the UV is for
+### 5. Checking for strands inside the body
+
+The agent checks whether strands pass into the body or the arms. This calculation is not in the add-on (in Blender the user can see it with their own eyes; the calculation is heavy, so it is for the agent's checking). Do it on a file that still has the wires (before the shape is applied).
+
+First decide what to test against.
+
+```bash
+blender -b model_k3.blend --python <repo>/skills/kanzashi/scripts/hair_penetration.py -- list
+```
+
+Choose the **closed meshes** hair must not enter: body, arms, legs, tail. Do not choose the head (roots sit on the head on purpose; the first 5 cm of every strand at the root are left out anyway). Add clothes and ornaments only when the user cares about them. When unsure which mesh is the body, show the candidates and ask.
+
+```bash
+blender -b model_k3.blend --python <repo>/skills/kanzashi/scripts/hair_penetration.py -- check --against Body Arm --report pen.json --render-dir pen_img
+```
+
+`strands` lists the buried strands, deepest first.
+
+| Field | Meaning |
+|---|---|
+| `wire` | number of the strand (wire); the same number as in the panel's list of colours |
+| `kind` | `tip`: the tip is inside; `through`: the middle is inside and the strand comes out again |
+| `depth_max_mm`, `buried_cm2` | depth at the deepest place, buried area |
+| `along` | which part of the strand (0 root, 1 tip) |
+| `warnings` | a partner that is not closed; results near its openings are unreliable |
+
+In the pictures buried strands are red and the partners brown. `spot*.png` are close views of the deepest places. Look at them yourself and see that they agree with the numbers.
+
+With no buried strand, say so and go on. Otherwise:
+
+★ Show the list (wire numbers, depth, tip or through) and the pictures and ask "N strands go into the body. How shall they be fixed?"
+
+| Choice | What to do |
+|---|---|
+| I fix them myself | as in step 3, the user moves the handles of step 4 in Blender; tell them the wire numbers. After they save, run `check` again |
+| Fix them by the AI's plan | "The AI fixes" below |
+| Leave them | nothing; write "N buried strands were left as they are" in the report |
+
+**The AI fixes**: state the plan in words first: "I will move wires 6, 0 and 30 outward by 15-30 mm. Wire 40 is 26 mm deep, so I leave it." Strands deeper than `--max-depth-mm` (default 25) are not moved automatically: the move would be large and change the shape too much. The user bends or reroutes those.
+
+```bash
+blender -b model_k3.blend --python <repo>/skills/kanzashi/scripts/hair_penetration.py -- fix --against Body Arm --out model_k3b.blend --report fix.json --render-dir fix_img
+```
+
+- The wire is moved outward a little more than the depth, smoothly along the wire. The result is the same as if the user had moved the handles, and can be adjusted by hand afterwards.
+- Read `wire_moved_mm`, `hair_moved_max_mm` (largest move of a hair vertex), `still_buried`, `new_buried` and `left_for_the_user` in the report.
+- In the pictures moved strands are blue and strands still buried red. Use `all_*.png` to see that the shape of the hair has not been spoiled.
+
+★ Show the pictures and numbers after the fix and ask "Is this fix all right?" On yes, go on with `model_k3b.blend`. Otherwise go back to `model_k3.blend` (it is untouched); the user fixes by hand, or run again limited to some strands with `--wire N`.
+
+Only the pose of the file is tested. Other poses of the arms and hair against hair are not.
+
+### 6. What the UV is for
 
 ★ Ask "How do you want to use the hair UV?"
 
@@ -118,13 +171,13 @@ Check that `hairs[].kept_strands` is true. Make the pictures again (step 2).
 blender -b model_k3.blend --python <repo>/scripts/kanzashi_run.py -- --out model_k4.blend --swap --report k4.json
 ```
 
-### 6. Applying the shape
+### 7. Applying the shape
 
 The bending setup (wires and modifiers) can stay in the file, so the user can go on later.
 
 ★ Before an export (FBX, VRM and so on), or when the user says the hair will not be bent any more, ask "May I write the bent shape into the mesh and remove the wires? To bend again afterwards, the detection has to be redone." On yes, run with `--apply`. The strand colours and the UV stay.
 
-### 7. Back to the production file
+### 8. Back to the production file
 
 The result is a copy of the original file with the hair changed. Whether it replaces the original or is kept as another version follows the user's own rules. Do not overwrite on your own.
 
@@ -132,6 +185,7 @@ The result is a copy of the original file with the hair changed. Whether it repl
 
 - Which file was made from which.
 - Number of strands, number of UV islands, the check (`check.ok`, the share of folded and squashed faces).
+- What the hair was tested against, how many strands were buried, how they were fixed (user / AI / left), and the count afterwards.
 - What the user confirmed, and their answers.
 - What was not checked (for example moving the rig, the look in the target application).
 

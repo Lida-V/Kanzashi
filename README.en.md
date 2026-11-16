@@ -44,7 +44,8 @@ When an AI agent reads this repository, [AGENTS.md](AGENTS.md) leads it to [skil
 2. Detects the strands and makes the UV without the panel, saving to a new file (`scripts/kanzashi_run.py`).
 3. Makes pictures in strand colours and lets the user judge the split (`scripts/kanzashi_preview.py`).
 4. Where something needs fixing, the user paints and bends in the Blender panel; the agent goes on from the saved file and makes the UV again.
-5. Asks the user before deciding what the UV is for (export / swap / just add) and before applying the shape.
+5. Checks whether strands go into the body and, if so, asks the user: "I fix them myself / fix them by the AI's plan / leave them" (`skills/kanzashi/scripts/hair_penetration.py`; this calculation is not in the add-on).
+6. Asks the user before deciding what the UV is for (export / swap / just add) and before applying the shape.
 
 ## Language
 
@@ -141,7 +142,7 @@ kanzashi/            the add-on
   swap.py            the swap and the export
   strands.py rewire.py wire.py   the layer below detection and wires
   blender_manifest.toml          the definition as an extension
-skills/kanzashi/     the skill for agents (SKILL.md in Japanese, SKILL.en.md in English)
+skills/kanzashi/     the skill for agents (SKILL.md in Japanese, SKILL.en.md in English) and its script that finds and fixes buried strands
 scripts/             kanzashi_run.py (no panel), kanzashi_preview.py (pictures for checking), kanzashi_panel.py (panel without installing)
 tools/               makes the ZIP packages; installs the add-on or tells whether it is installed; checks the English texts
 tests/               compares the results before and after a change of the code

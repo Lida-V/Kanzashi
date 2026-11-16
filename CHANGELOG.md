@@ -6,6 +6,7 @@
 - `scripts/kanzashi_run.py`：検出済みの髪は毛束を残して UV だけを作り直す。`--swap`（張り替え）、`--apply`（形の確定）、`--redetect`（検出のやり直し）を足した。UV の検査に落ちたときは終了コードが 1 になる。
 - `scripts/kanzashi_preview.py`：毛束ごとの色の画像（前・後ろ・左・右と UV）を出す。
 - `tools/install_addon.py`：アドオンが入っているかを調べる（`--check`）、ZIP を作って拡張機能として入れる。
+- `skills/kanzashi/scripts/hair_penetration.py`：エージェントの確認用。毛束ごとに、体へ入っている深さ・面積・毛先か途中かを調べる（`check`）。ワイヤーを外へ動かして直す（`fix`、新しいファイルに保存）。アドオンには入れていない。スキルに、直し方をユーザーに聞く工程を足した。
 
 English: a skill for agents (`skills/kanzashi/`), `kanzashi_run.py` keeps existing strands and gained `--swap`, `--apply`, `--redetect`; `kanzashi_preview.py` renders the strand colours; `tools/install_addon.py` checks and installs the add-on.
 

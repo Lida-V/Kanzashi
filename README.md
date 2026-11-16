@@ -46,7 +46,8 @@ AI エージェントにこのリポジトリを読ませると、[AGENTS.md](AG
 2. パネルなしで毛束の検出と UV を行い、新しいファイルに保存する（`scripts/kanzashi_run.py`）。
 3. 毛束ごとの色の画像を作って、分かれ方をユーザーに見てもらう（`scripts/kanzashi_preview.py`）。
 4. 直す所があれば、ユーザーが Blender のパネルで塗る・曲げる。エージェントは、保存されたファイルの続きから UV を作り直す。
-5. UV の使い道（書き出し／張り替え／足すだけ）と、形の確定を、ユーザーに確認してから行う。
+5. 毛束が体に入っていないかを調べ、入っていれば「自分で直す／AI の案で直す／そのまま」をユーザーに聞く（`skills/kanzashi/scripts/hair_penetration.py`。この計算はアドオンには入っていません）。
+6. UV の使い道（書き出し／張り替え／足すだけ）と、形の確定を、ユーザーに確認してから行う。
 
 ## 言語
 
@@ -141,7 +142,7 @@ kanzashi/            アドオン
   swap.py            張り替えと書き出し
   strands.py rewire.py wire.py   検出とワイヤーの下の層
   blender_manifest.toml          拡張機能としての定義
-skills/kanzashi/     エージェント向けのスキル（SKILL.md、英語は SKILL.en.md）
+skills/kanzashi/     エージェント向けのスキル（SKILL.md、英語は SKILL.en.md）と、貫通を調べる・直すスクリプト
 scripts/             パネルなしで動かす kanzashi_run.py、確認用の画像を出す kanzashi_preview.py、入れずにパネルを出す kanzashi_panel.py
 tools/               配布用の ZIP を作る、アドオンを入れる・入っているかを調べる、英語の文の抜けを調べる
 tests/               整理の前後で結果が変わらないかを比べるテスト
