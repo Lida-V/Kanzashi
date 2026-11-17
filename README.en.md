@@ -125,7 +125,69 @@ Within the making of a character, do this **after the head and the hair are spli
 3. Where a colour is wrong, press "Start Fixing Colours" in step 3. Click a face of the right colour with the eyedropper, then stroke over the faces to fix with the brush.
 4. To bend a strand, show its handles in step 4 and move them (G key).
 5. Press "Make the Strand UV" in step 5. It takes tens of seconds. The result of the check is shown below the button.
-6. To make new textures, use "Export for Texturing". **When texturing in Tripo, do not use Smart UV on the hair** (it makes a new UV and the strand UV is lost; keep the original UV). To keep the current look on the new UV, use "Swap to this UV".
+6. When you are done, press "Close the Tool" in step 6.
+
+The top of the panel tells you in red what to press next. Below are the screens of each step (left: the 3D view, right: the box of that step in the panel).
+
+### 1 Choose the hair
+
+"Auto register" looks for the hair meshes by object and material names and puts them in the list.
+
+![Step 1: choose the hair](docs/step1.en.png)
+
+- Remove a wrong entry with the X at the right of its row.
+- For hair that was not found, select it in the 3D view and press "Add selected", or choose it in the "Add by name" field.
+- "Show Hair Only" hides everything else; "Show hidden" brings it back.
+
+### 2 Detect the strands
+
+"Detect strands" shows the hair in one colour per strand and gives each strand a wire (the black lines).
+
+![Step 2: detect the strands](docs/step2.en.png)
+
+- The crown is the highest point by default. Clear the checkbox to use the 3D cursor instead.
+- Detect only once. Afterwards the button reads "Detect again"; a second detection throws away your repainting and bending.
+
+### 3 Fix wrong colours
+
+Press "Start Fixing Colours". Click a face of the right colour with the eyedropper, then stroke over the faces to fix with the brush: they move to the strand of that colour.
+
+![Step 3: fix wrong colours](docs/step3.en.png)
+
+- "Click a strand: show 2 colours" keeps only the current colour and the one you click, and hides the rest.
+- Click a row of the colour list to choose that colour. The eye hides it, the arrow shows it alone.
+- "Add a colour" makes a new strand.
+- Press "Stop Fixing Colours" when you are done.
+
+### 4 Bend the hair by wires
+
+Press "Show Handles and Bend", then click a face of the strand to bend. Round handles appear on its wire. Click a handle and move it with G; the strand follows the wire.
+
+![Step 4: bend the hair by wires](docs/step4.en.png)
+
+- R rotates. X, Y, Z lock an axis; Shift moves slowly.
+- The first 5 cm at the root stay put; the rest bends.
+- Press "Finish bending" when you are done. Until you apply the shape in step 6, you can bend again as often as you like.
+
+### 5 UV per strand
+
+Press "Make the Strand UV". It takes tens of seconds. The result of the check is shown below.
+
+![Step 5: UV per strand](docs/step5.en.png)
+
+- The UV map is called `LW_StrandUV`. The original UV is kept; switch with "Strand UV" and "Original UV".
+- To make new textures, use "Export for Texturing". **When texturing in Tripo, do not use Smart UV on the hair** (it makes a new UV and the strand UV is lost; keep the original UV).
+- To keep the current look on the new UV, use "Swap to this UV".
+
+### 6 Finish
+
+"Close the Tool" puts the view back. The wires stay, so you can continue later.
+
+![Step 6: finish](docs/step6.en.png)
+
+- "Apply Shape and Remove Setup" writes the bent shape into the mesh and removes the wires. After that you cannot bend again.
+
+The screens are from 0.4.1. The hair in the pictures is an example and is not in the repository.
 
 When you come back to edit more, **do not detect again**; go to step 3. A second detection rebuilds everything, and your repainting and bending are lost.
 
