@@ -2,6 +2,8 @@
 
 日本語 | [English](README.en.md)
 
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/kanzashi_logo_dark.png"><img src="docs/kanzashi_logo.png" alt="Kanzashi" width="440"></picture></p>
+
 ![Kanzashi のあらまし：ひとかたまりの髪を、毛束ごとの色とワイヤーに分ける](docs/fig_overview.ja.svg)
 
 Kanzashi は、3D 生成サービスで作った髪のメッシュを、毛束 1 本ずつ扱えるようにする Blender のアドオンです。
@@ -209,7 +211,7 @@ skills/kanzashi/     エージェント向けのスキル（SKILL.md、英語は
 scripts/             パネルなしで動かす kanzashi_run.py、確認用の画像を出す kanzashi_preview.py、UV を作った髪が分割・作り直しされていないかを調べる kanzashi_guard.py、入れずにパネルを出す kanzashi_panel.py
 tools/               配布用の ZIP を作る、アドオンを入れる・入っているかを調べる、英語の文の抜けを調べる、README の図を描く
 tests/               整理の前後で結果が変わらないかを比べるテスト
-docs/                README の図（模式図は tools/make_figures.py が描く）と、実際の髪で撮った画像
+docs/                ロゴ、README の図（模式図は tools/make_figures.py が描く）、実際の髪で撮った画像
 ```
 
 モデル・テクスチャは入っていません。

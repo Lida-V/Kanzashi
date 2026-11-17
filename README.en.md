@@ -2,6 +2,8 @@
 
 [日本語](README.md) | English
 
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/kanzashi_logo_dark.png"><img src="docs/kanzashi_logo.png" alt="Kanzashi" width="440"></picture></p>
+
 ![What Kanzashi does: one fused hair mesh becomes strands, each with a colour and a wire](docs/fig_overview.en.svg)
 
 Kanzashi is a Blender add-on that lets you work on a generated hair mesh strand by strand.
@@ -209,7 +211,7 @@ skills/kanzashi/     the skill for agents (SKILL.md in Japanese, SKILL.en.md in 
 scripts/             kanzashi_run.py (no panel), kanzashi_preview.py (pictures for checking), kanzashi_guard.py (was a hair with the strand UV split or unwrapped again?), kanzashi_panel.py (panel without installing)
 tools/               makes the ZIP packages; installs the add-on or tells whether it is installed; checks the English texts; draws the figures of the README
 tests/               compares the results before and after a change of the code
-docs/                figures of the README (the schematic ones are drawn by tools/make_figures.py) and pictures of real hair
+docs/                the logo, figures of the README (the schematic ones are drawn by tools/make_figures.py) and pictures of real hair
 ```
 
 No models or textures are included.
