@@ -2,17 +2,37 @@
 
 [日本語](README.md) | English
 
-A Blender tool that splits a generated hair mesh into strands, lets you fix the split by painting, bends each strand by a wire, and makes a UV map with one island per strand.
-It is made for hair that comes out of 3D generation services such as Tripo as one fused lump.
+![What Kanzashi does: one fused hair mesh becomes strands, each with a colour and a wire](docs/fig_overview.en.svg)
+
+Kanzashi is a Blender add-on that lets you work on a generated hair mesh strand by strand.
+It splits the hair into strands, lets you fix the split by painting, bends each strand by a wire, and makes a UV map with one island per strand.
 
 - Version: 0.4.1 (prototype). This repository is private.
 - Tested with: Blender 5.3.0 on Windows 11. Other versions are untested.
 - Author: Lida
 - Panel languages: Japanese and English (see "Language" below).
 
-![Example of the UV per strand](docs/strand_uv_example.jpg)
+## What kind of add-on it is
+
+Hair that comes out of 3D generation services such as Tripo is usually one mesh with everything fused together. As it is, these things are hard:
+
+- Selecting or moving a single strand, for example moving only the strand that runs into an arm.
+- Fixing the flow of the hair strand by strand.
+- Making the texture again, because the UV does not follow the shape of the strands.
+
+Kanzashi splits that hair into strands and gives each strand a **colour** and a **wire**.
+
+- The colour shows which faces belong to which strand. Where the split is wrong, paint the faces and they move to the right strand.
+- The wire is a line through the middle of the strand. Move a handle on the wire and the strand bends along it.
+- When the split is right, it makes a UV map in which each strand is one island.
+
+It is meant for hair fused into one lump (one mesh, or a few). Do not use it on hair that is already separate strand parts, or on hair made of hair cards only.
 
 ## What it does
+
+The panel has six steps, used from the top down.
+
+![The six steps of the panel](docs/fig_steps.en.svg)
 
 | Step | What happens |
 |---|---|
@@ -22,6 +42,35 @@ It is made for hair that comes out of 3D generation services such as Tripo as on
 | 4 Bend the hair by wires | Click a strand to get handles on its wire. Move a handle and the strand bends (the first 5 cm at the root stay put) |
 | 5 UV per strand | One island per strand, packed into 0-1. Check, export for texturing (FBX / GLB), swap (transfers the current textures to the new UV), revert |
 | 6 Finish | Put the view back / write the bent shape into the mesh and remove the setup |
+
+### Fixing by painting, bending by wire
+
+![Fixing wrong colours by painting, and bending a strand by its wire](docs/fig_edit.en.svg)
+
+- The detection is automatic, so one lock may be cut into two colours, or two locks joined in one. You look at those places and repaint them.
+- Bending does not rewrite the mesh at once. Until you apply the shape in step 6, you can bend again as often as you like.
+
+### UV per strand
+
+![From hair split into strands to a UV per strand](docs/fig_uv.en.svg)
+
+An example made from real hair (the islands are in the strand colours):
+
+![Example of the UV per strand](docs/strand_uv_example.jpg)
+
+### Place in the pipeline, and three ways to use it
+
+![The place in the pipeline and the three ways to use it](docs/fig_flow.en.svg)
+
+| Way | Good for | Read |
+|---|---|---|
+| A Panel (add-on) | painting and bending in Blender while you look | "Install (add-on)", "Order of work" |
+| B Scripts | detection and UV in one go, without the panel | "Without the panel (script)" |
+| C Skill (AI agent) | leaving the hair to an agent and confirming only the key points yourself | "Use by an agent (skill)" |
+
+When an agent uses it, there is also a script that finds and fixes strands running into the body or the arms (it is not part of the add-on).
+
+The figures are schematic drawings made by `tools/make_figures.py`.
 
 ## Install (add-on)
 
@@ -146,9 +195,9 @@ kanzashi/            the add-on
   blender_manifest.toml          the definition as an extension
 skills/kanzashi/     the skill for agents (SKILL.md in Japanese, SKILL.en.md in English) and its script that finds and fixes buried strands
 scripts/             kanzashi_run.py (no panel), kanzashi_preview.py (pictures for checking), kanzashi_guard.py (was a hair with the strand UV split or unwrapped again?), kanzashi_panel.py (panel without installing)
-tools/               makes the ZIP packages; installs the add-on or tells whether it is installed; checks the English texts
+tools/               makes the ZIP packages; installs the add-on or tells whether it is installed; checks the English texts; draws the figures of the README
 tests/               compares the results before and after a change of the code
-docs/                figure
+docs/                figures of the README (the schematic ones are drawn by tools/make_figures.py)
 ```
 
 No models or textures are included.

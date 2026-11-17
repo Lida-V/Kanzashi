@@ -2,9 +2,10 @@
 
 ## 未リリース
 
+- README（日本語・英語）：どういうアドオンか、何ができるかを図で説明した。図は `tools/make_figures.py` が描く模式図（`docs/fig_*.svg`）。
 - スキル：工程の位置を決まりにした。頭と髪のパーツ分けの後、テクスチャを貼り直す前に行う。手順 0 で順番を確かめ、逆のときはユーザーに聞く。
 
-English: the skill now fixes the place in the pipeline (after the head and the hair are split into parts, before the textures are redone) and checks it in step 0.
+English: the READMEs now explain with figures what the add-on is and what it does (`docs/fig_*.svg`, drawn by `tools/make_figures.py`); the skill now fixes the place in the pipeline (after the head and the hair are split into parts, before the textures are redone) and checks it in step 0.
 
 ## 0.4.1（試作）
 
