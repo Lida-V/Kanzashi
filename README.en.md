@@ -9,7 +9,7 @@
 Kanzashi is a Blender add-on that lets you work on a generated hair mesh strand by strand.
 It splits the hair into strands, lets you fix the split by painting, bends each strand by a wire, and makes a UV map with one island per strand.
 
-- Version: 0.4.1 (prototype). This repository is private.
+- Version: 0.4.1 (prototype)
 - Tested with: Blender 5.3.0 on Windows 11. Other versions are untested.
 - Author: Lida
 - Panel languages: Japanese and English (see "Language" below).
@@ -83,8 +83,6 @@ An example made from real hair (the islands are in the strand colours):
 | C Skill (AI agent) | leaving the hair to an agent and confirming only the key points yourself | "Use by an agent (skill)" |
 
 When an agent uses it, there is also a script that finds and fixes strands running into the body or the arms (it is not part of the add-on).
-
-`docs/fig_*.svg` are schematic drawings made by `tools/make_figures.py`; `docs/shot_*.jpg` and the UV example are pictures of real hair (the model itself is not included).
 
 ## Install (add-on)
 
@@ -194,43 +192,13 @@ blender -b model_kanzashi.blend --python kanzashi_preview.py -- --out-dir previe
 
 ```
 kanzashi/            the add-on
-  panel.py           the panel and the registration
-  ops_hair.py        1 registering hair, 2 detection
-  ops_paint.py       3 repainting
-  ops_bend.py        4 bending, 6 finishing and applying the shape
-  ops_uv.py          5 the strand UV, its check, the swap, the export
-  common.py          what those five share (viewport set-ups, picking and painting faces, handles)
-  i18n.py            the Japanese and English texts
-  tree.py            detection of the strands
-  edit.py            edits after the detection (applying the repaint, hiding strands, applying the shape)
-  strand_uv.py       the UV per strand and its check
-  swap.py            the swap and the export
-  strands.py rewire.py wire.py   the layer below detection and wires
-  blender_manifest.toml          the definition as an extension
 skills/kanzashi/     the skill for agents (SKILL.md in Japanese, SKILL.en.md in English) and its script that finds and fixes buried strands
-scripts/             kanzashi_run.py (no panel), kanzashi_preview.py (pictures for checking), kanzashi_guard.py (was a hair with the strand UV split or unwrapped again?), kanzashi_panel.py (panel without installing)
-tools/               makes the ZIP packages; installs the add-on or tells whether it is installed; checks the English texts; draws the figures of the README
-tests/               compares the results before and after a change of the code
-docs/                the logo, figures of the README (the schematic ones are drawn by tools/make_figures.py) and pictures of real hair
+scripts/             scripts that run without the panel (detection and UV, pictures for checking, the check of the UV mark, panel without installing)
+tools/               makes the ZIP packages; installs the add-on or tells whether it is installed
+docs/                the logo, and the figures and pictures of the README
 ```
 
-No models or textures are included.
-
-## Tests
-
-After a change of the code, compare the results with those from before on a hair file of your own (no models are in the repository). The opened file is not saved.
-
-```bash
-blender -b hair.blend --python tests/regress.py -- --out before.json
-```
-
-```bash
-python tests/compare.py before.json after.json
-```
-
-Nine steps are recorded as numbers and hashes: register, detect, repaint, bend, UV, check, swap and back, export, apply. Missing English texts: `python tools/check_i18n.py`. Style: `ruff check .` and `ruff format .`.
-
-Compatibility with files made by older versions: the mesh attributes (`lw_*`), the scene settings (`lida_hs_*`) and the names of modifiers and node groups are the same as in 0.1-0.2, so a file detected or repainted with those versions can be continued. What changed are the operator names (`lida.hs_*` -> `kanzashi.*`) and the module names.
+No models or textures are included. Notes for people changing the code (tests, rules) are in [AGENTS.md](AGENTS.md).
 
 ## Licence
 

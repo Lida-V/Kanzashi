@@ -9,9 +9,7 @@
 Kanzashi は、3D 生成サービスで作った髪のメッシュを、毛束 1 本ずつ扱えるようにする Blender のアドオンです。
 髪を毛束に分け、分かれ方を塗って直し、ワイヤーで曲げ、毛束ごとの UV まで作ります。
 
-**Kanzashi — hair strand tool for Blender**: splits an AI-generated hair mesh into strands, lets you fix the split by painting, bends each strand by a wire, and makes a UV map per strand. → [English README](README.en.md)
-
-- 版：0.4.1（試作）。非公開のリポジトリです。
+- 版：0.4.1（試作）
 - 確かめた環境：Blender 5.3.0、Windows 11。ほかの版では試していません。
 - 作者：Lida
 - パネルの言語：日本語と英語（下の「言語」）
@@ -85,8 +83,6 @@ Blender の画面です。右のサイドバーの「Kanzashi」タブに 6 つ�
 | C スキル（AI エージェント） | エージェントに髪の調整を任せ、要所だけ自分で確認する | 「エージェントから使う（スキル）」 |
 
 エージェントから使うときは、毛束が体や腕に入っていないかを調べる・直すスクリプトも使えます（アドオンには入っていません）。
-
-`docs/fig_*.svg` は `tools/make_figures.py` が描いた模式図、`docs/shot_*.jpg` と UV の例は実際の髪で撮った画像です（モデルそのものは入っていません）。
 
 ## 入れ方（アドオン）
 
@@ -194,43 +190,13 @@ blender -b model_kanzashi.blend --python kanzashi_preview.py -- --out-dir previe
 
 ```
 kanzashi/            アドオン
-  panel.py           パネルと登録
-  ops_hair.py        ① 髪の登録、② 検出
-  ops_paint.py       ③ 色の塗り直し
-  ops_bend.py        ④ 曲げる、⑥ 終わる・確定
-  ops_uv.py          ⑤ 毛束ごとの UV・検査・張り替え・書き出し
-  common.py          上の 5 つが共に使う処理（表示の切り替え、面を拾う・塗る、つまみ）
-  i18n.py            日本語と英語の文
-  tree.py            毛束の検出
-  edit.py            検出の後の編集（塗り直しの反映、毛束を隠す、形の確定）
-  strand_uv.py       毛束ごとの UV と検査
-  swap.py            張り替えと書き出し
-  strands.py rewire.py wire.py   検出とワイヤーの下の層
-  blender_manifest.toml          拡張機能としての定義
 skills/kanzashi/     エージェント向けのスキル（SKILL.md、英語は SKILL.en.md）と、貫通を調べる・直すスクリプト
-scripts/             パネルなしで動かす kanzashi_run.py、確認用の画像を出す kanzashi_preview.py、UV を作った髪が分割・作り直しされていないかを調べる kanzashi_guard.py、入れずにパネルを出す kanzashi_panel.py
-tools/               配布用の ZIP を作る、アドオンを入れる・入っているかを調べる、英語の文の抜けを調べる、README の図を描く
-tests/               整理の前後で結果が変わらないかを比べるテスト
-docs/                ロゴ、README の図（模式図は tools/make_figures.py が描く）、実際の髪で撮った画像
+scripts/             パネルなしで動かすスクリプト（検出と UV、確認用の画像、UV の印の検査、入れずにパネルを出す）
+tools/               配布用の ZIP を作る、アドオンを入れる・入っているかを調べる
+docs/                ロゴと README の図・画像
 ```
 
-モデル・テクスチャは入っていません。
-
-## テスト
-
-コードを直したら、直す前と同じ結果になるかを、手元の髪のファイルで比べます（モデルはリポジトリに入れていません）。開いたファイルは保存しません。
-
-```bash
-blender -b hair.blend --python tests/regress.py -- --out before.json
-```
-
-```bash
-python tests/compare.py before.json after.json
-```
-
-登録、検出、塗り直し、曲げ、UV、検査、張り替えと戻し、書き出し、確定の 9 段の結果を、数とハッシュで記録します。英語の文の抜けは `python tools/check_i18n.py`、書き方は `ruff check .` と `ruff format .` で調べます。
-
-古い版で作ったファイルとの互換：メッシュの属性（`lw_*`）、シーンの設定（`lida_hs_*`）、モディファイアやノードグループの名前は、0.1〜0.2 と同じです。0.2 までに検出・塗り直しをしたファイルは、そのまま続きができます。変えたのは、オペレーターの名前（`lida.hs_*` → `kanzashi.*`）とモジュールの名前だけです。
+モデル・テクスチャは入っていません。コードを直す人向けの説明（テスト、決まり）は [AGENTS.md](AGENTS.md) にあります。
 
 ## ライセンス
 
