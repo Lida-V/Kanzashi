@@ -26,6 +26,10 @@ Kanzashi splits that hair into strands and gives each strand a **colour** and a 
 - The wire is a line through the middle of the strand. Move a handle on the wire and the strand bends along it.
 - When the split is right, it makes a UV map in which each strand is one island.
 
+Real hair after detection and repainting (left: the whole hair from behind; right: a close view of the crown). One colour is one strand.
+
+![Real hair split into one colour per strand](docs/shot_strands.jpg)
+
 It is meant for hair fused into one lump (one mesh, or a few). Do not use it on hair that is already separate strand parts, or on hair made of hair cards only.
 
 ## What it does
@@ -33,6 +37,10 @@ It is meant for hair fused into one lump (one mesh, or a few). Do not use it on 
 The panel has six steps, used from the top down.
 
 ![The six steps of the panel](docs/fig_steps.en.svg)
+
+The Blender window: the six steps are in the "Kanzashi" tab of the sidebar on the right (a hair that is already detected; the black lines are the wires). The screenshot shows the panel in Japanese; it can be switched to English.
+
+![The Blender window: the Kanzashi panel, and hair with a colour and a wire per strand](docs/shot_panel.jpg)
 
 | Step | What happens |
 |---|---|
@@ -46,6 +54,10 @@ The panel has six steps, used from the top down.
 ### Fixing by painting, bending by wire
 
 ![Fixing wrong colours by painting, and bending a strand by its wire](docs/fig_edit.en.svg)
+
+One strand (orange) of real hair bent by its wire. From the left: before, after moving the handle at the tip by 10 cm, after moving a handle in the middle by 5 cm. The other strands do not move.
+
+![One strand of real hair bent by its wire](docs/shot_bend.jpg)
 
 - The detection is automatic, so one lock may be cut into two colours, or two locks joined in one. You look at those places and repaint them.
 - Bending does not rewrite the mesh at once. Until you apply the shape in step 6, you can bend again as often as you like.
@@ -70,7 +82,7 @@ An example made from real hair (the islands are in the strand colours):
 
 When an agent uses it, there is also a script that finds and fixes strands running into the body or the arms (it is not part of the add-on).
 
-The figures are schematic drawings made by `tools/make_figures.py`.
+`docs/fig_*.svg` are schematic drawings made by `tools/make_figures.py`; `docs/shot_*.jpg` and the UV example are pictures of real hair (the model itself is not included).
 
 ## Install (add-on)
 
@@ -197,7 +209,7 @@ skills/kanzashi/     the skill for agents (SKILL.md in Japanese, SKILL.en.md in 
 scripts/             kanzashi_run.py (no panel), kanzashi_preview.py (pictures for checking), kanzashi_guard.py (was a hair with the strand UV split or unwrapped again?), kanzashi_panel.py (panel without installing)
 tools/               makes the ZIP packages; installs the add-on or tells whether it is installed; checks the English texts; draws the figures of the README
 tests/               compares the results before and after a change of the code
-docs/                figures of the README (the schematic ones are drawn by tools/make_figures.py)
+docs/                figures of the README (the schematic ones are drawn by tools/make_figures.py) and pictures of real hair
 ```
 
 No models or textures are included.
