@@ -84,9 +84,20 @@ Blender の画面です。右のサイドバーの「Kanzashi」タブに 6 つ�
 
 エージェントから使うときは、毛束が体や腕に入っていないかを調べる・直すスクリプトも使えます（アドオンには入っていません）。
 
+## 配布している場所と中身
+
+| 中身 | BOOTH | GitHub |
+|---|---|---|
+| アドオン（Blender に入れて、パネルで使う）`Kanzashi-addon-0.4.1.zip` | ○ | ○（[Release](https://github.com/Lida-V/Kanzashi/releases)） |
+| パネルなしで動かすスクリプト `Kanzashi-scripts-0.4.1.zip` | × | ○（[Release](https://github.com/Lida-V/Kanzashi/releases)） |
+| エージェント向けのスキル（`skills/kanzashi/`。貫通を調べる・直すスクリプトを含む） | × | ○（このリポジトリの中だけ） |
+
+- BOOTH（無料）：https://lidamidorin.booth.pm/items/9167843 。アドオンだけを配っています。
+- スクリプトとスキルは GitHub だけです。
+
 ## 入れ方（アドオン）
 
-1. `Kanzashi-addon-0.4.1.zip` を用意します（`python tools/build_packages.py` で `dist/` に出来ます）。
+1. `Kanzashi-addon-0.4.1.zip` を用意します（BOOTH か GitHub の Release から。`python tools/build_packages.py` でも `dist/` に出来ます）。
 2. Blender の「編集 > プリファレンス > アドオン」の右上のメニューから「ディスクからインストール」を選び、ZIP を指定します（拡張機能として入ります）。
 3. 「Kanzashi」を有効にします。
 4. 3D ビューでサイドバー（N キー）を開くと、「Kanzashi」のタブがあります。

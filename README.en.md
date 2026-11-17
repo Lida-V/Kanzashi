@@ -84,9 +84,20 @@ An example made from real hair (the islands are in the strand colours):
 
 When an agent uses it, there is also a script that finds and fixes strands running into the body or the arms (it is not part of the add-on).
 
+## Where it is distributed and what each place has
+
+| What | BOOTH | GitHub |
+|---|---|---|
+| The add-on (install in Blender, use the panel) `Kanzashi-addon-0.4.1.zip` | yes | yes ([Release](https://github.com/Lida-V/Kanzashi/releases)) |
+| The scripts that run without the panel `Kanzashi-scripts-0.4.1.zip` | no | yes ([Release](https://github.com/Lida-V/Kanzashi/releases)) |
+| The skill for agents (`skills/kanzashi/`, with the script that finds and fixes buried strands) | no | yes (in this repository only) |
+
+- BOOTH (free): https://lidamidorin.booth.pm/items/9167843 . Only the add-on is there.
+- The scripts and the skill are on GitHub only.
+
 ## Install (add-on)
 
-1. Get `Kanzashi-addon-0.4.1.zip` (`python tools/build_packages.py` makes it in `dist/`).
+1. Get `Kanzashi-addon-0.4.1.zip` (from BOOTH or the GitHub Release; `python tools/build_packages.py` also makes it in `dist/`).
 2. In Blender, open Edit > Preferences > Add-ons, choose "Install from Disk" in the menu at the top right, and pick the ZIP (it is installed as an extension).
 3. Enable "Kanzashi".
 4. Open the sidebar of the 3D viewport (N key). There is a "Kanzashi" tab.
