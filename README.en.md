@@ -4,6 +4,9 @@
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/kanzashi_logo_dark.png"><img src="docs/kanzashi_logo.png" alt="Kanzashi" width="440"></picture></p>
 
+<p align="center"><a href="https://www.tripo3d.ai/"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/tripo_logo_dark.png"><img src="docs/tripo_logo.png" alt="Tripo" height="36"></picture></a></p>
+<p align="center"><b>Official Tripo collaboration</b></p>
+
 ![What Kanzashi does: one fused hair mesh becomes strands, each with a colour and a wire](docs/fig_overview.en.svg)
 
 Kanzashi is a Blender add-on that lets you work on a generated hair mesh strand by strand.
@@ -12,6 +15,7 @@ It splits the hair into strands, lets you fix the split by painting, bends each 
 - Version: 0.4.1 (prototype)
 - Tested with: Blender 5.3.0 on Windows 11. Other versions are untested.
 - Author: Lida
+- Official Tripo collaboration
 - Panel languages: Japanese and English (see "Language" below).
 
 ## What kind of add-on it is
