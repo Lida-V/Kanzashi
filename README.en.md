@@ -4,8 +4,8 @@
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/kanzashi_logo_dark.png"><img src="docs/kanzashi_logo.png" alt="Kanzashi" width="440"></picture></p>
 
-<p align="center"><a href="https://www.tripo3d.ai/"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/tripo_logo_dark.png"><img src="docs/tripo_logo.png" alt="Tripo" height="36"></picture></a></p>
-<p align="center"><b>Official Tripo collaboration</b></p>
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/lida_logo_dark.png"><img src="docs/lida_logo.png" alt="Lida" height="64" align="middle"></picture>&nbsp;&nbsp;&nbsp;<b>×</b>&nbsp;&nbsp;&nbsp;<a href="https://www.tripo3d.ai/"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/tripo_logo_dark.png"><img src="docs/tripo_logo.png" alt="Tripo" height="32" align="middle"></picture></a></p>
+<p align="center"><b>Lida × Tripo official collaboration</b></p>
 
 ![What Kanzashi does: one fused hair mesh becomes strands, each with a colour and a wire](docs/fig_overview.en.svg)
 
@@ -15,7 +15,7 @@ It splits the hair into strands, lets you fix the split by painting, bends each 
 - Version: 0.4.1 (prototype)
 - Tested with: Blender 5.3.0 on Windows 11. Other versions are untested.
 - Author: Lida
-- Official Tripo collaboration
+- Lida × Tripo official collaboration
 - Panel languages: Japanese and English (see "Language" below).
 
 ## What kind of add-on it is

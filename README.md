@@ -4,8 +4,8 @@
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/kanzashi_logo_dark.png"><img src="docs/kanzashi_logo.png" alt="Kanzashi" width="440"></picture></p>
 
-<p align="center"><a href="https://www.tripo3d.ai/"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/tripo_logo_dark.png"><img src="docs/tripo_logo.png" alt="Tripo" height="36"></picture></a></p>
-<p align="center"><b>Tripo 公式コラボ</b></p>
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/lida_logo_dark.png"><img src="docs/lida_logo.png" alt="リダ（Lida）" height="64" align="middle"></picture>&nbsp;&nbsp;&nbsp;<b>×</b>&nbsp;&nbsp;&nbsp;<a href="https://www.tripo3d.ai/"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/tripo_logo_dark.png"><img src="docs/tripo_logo.png" alt="Tripo" height="32" align="middle"></picture></a></p>
+<p align="center"><b>リダ × Tripo 公式コラボ</b></p>
 
 ![Kanzashi のあらまし：ひとかたまりの髪を、毛束ごとの色とワイヤーに分ける](docs/fig_overview.ja.svg)
 
@@ -15,7 +15,7 @@ Kanzashi は、3D 生成サービスで作った髪のメッシュを、毛束 1
 - 版：0.4.1（試作）
 - 確かめた環境：Blender 5.3.0、Windows 11。ほかの版では試していません。
 - 作者：Lida
-- Tripo 公式コラボ
+- リダ × Tripo 公式コラボ
 - パネルの言語：日本語と英語（下の「言語」）
 
 ## どういうアドオンか
