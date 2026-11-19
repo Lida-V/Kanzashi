@@ -216,7 +216,7 @@ blender -b model_k3.blend --python <repo>/scripts/kanzashi_run.py -- --out model
 
 ## 分かっている限界
 
-- 試作です。Blender 5.3、Windows でしか試していません。
+- Blender 5.3、Windows でしか試していません。
 - 塗りは面ごとです。面より細かくは塗れません。
 - 板のような前髪、細い面、平らに開きにくい形では、検出が粗くなったり、UV の島が毛束の数よりずっと多くなったりします。
 - 枝分かれした毛束のワイヤーは、親のワイヤーに付いて動きません。

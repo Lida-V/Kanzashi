@@ -184,7 +184,7 @@ EN = {
     "画像を写し中：%s": "Transferring image: %s",
     "色の答え合わせ中": "Checking the colours",
     # the panel
-    "Kanzashi（かんざし）試作": "Kanzashi (prototype)",
+    "Kanzashi（かんざし）": "Kanzashi",
     "処理中（%d %%）。待ってください": "Working (%d %%). Please wait",
     "① の「自動で登録」を押す": 'step 1 "Auto register"',
     "② の「毛束を検出」を押す": 'step 2 "Detect strands"',

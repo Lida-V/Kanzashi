@@ -213,7 +213,7 @@ The result is a copy of the original file with the hair changed. Whether it repl
 
 ## Known limits
 
-- A prototype, tested with Blender 5.3 on Windows only.
+- Tested with Blender 5.3 on Windows only.
 - Painting is per face; nothing finer than a face can be painted.
 - With flat sheet-like bangs, thin faces or shapes that do not unfold well, the detection gets coarse or the UV gets many more islands than strands.
 - The wire of a branch does not follow the wire of its parent.

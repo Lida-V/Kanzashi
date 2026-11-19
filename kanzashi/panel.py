@@ -58,7 +58,7 @@ class KanzashiFaceTool(bpy.types.WorkSpaceTool):
 
 
 class KANZASHI_PT_main(bpy.types.Panel):
-    bl_label = "Kanzashi（かんざし）試作"
+    bl_label = "Kanzashi（かんざし）"
     bl_idname = "KANZASHI_PT_main"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"

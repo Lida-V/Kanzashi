@@ -12,7 +12,7 @@
 Kanzashi is a Blender add-on that lets you work on a generated hair mesh strand by strand.
 It splits the hair into strands, lets you fix the split by painting, bends each strand by a wire, and makes a UV map with one island per strand.
 
-- Version: 0.4.1 (prototype)
+- Version: 0.4.1
 - Tested with: Blender 5.3.0 on Windows 11. Other versions are untested.
 - Author: Lida
 - Lida × Tripo official collaboration
@@ -256,7 +256,7 @@ blender -b model_kanzashi.blend --python kanzashi_preview.py -- --out-dir previe
 
 ## Known limits
 
-- This is a prototype, tested with Blender 5.3 only.
+- Tested with Blender 5.3 only.
 - With flat sheet-like bangs, thin faces, or shapes that do not unfold well, the detection gets coarse or the UV gets many islands.
 - The wire of a branch does not follow the wire of its parent.
 - Repaint before you bend. Repainting after bending moves faces to the wrong place.

@@ -7,7 +7,7 @@
 
 English: the READMEs now explain with figures what the add-on is and what it does (`docs/fig_*.svg`, drawn by `tools/make_figures.py`); the skill now fixes the place in the pipeline (after the head and the hair are split into parts, before the textures are redone) and checks it in step 0.
 
-## 0.4.1（試作）
+## 0.4.1
 
 - ③ と ④ は、どちらか片方だけが動くようにした。「色を直すモードに入る」を押すと、曲げている最中ならつまみを書き戻して消してから入る（逆向きは前からそうなっていた）。
 - つまみの G（動かす）と R（回す）を、Kanzashi の操作にした（つまみを選んでいる間だけ。ほかの物の G・R は Blender のまま）。動かしている・回している最中も、中ボタンのドラッグとホイールで視点を変えられる。クリックで決定、右クリック・Esc で取り消し、X・Y・Z で軸、Shift でゆっくり。数値の入力はできない。
@@ -17,7 +17,7 @@ English: the READMEs now explain with figures what the add-on is and what it doe
 
 English: a hair that got the strand UV is marked, and `scripts/kanzashi_guard.py` tells when it was later split, joined or unwrapped again; steps 3 and 4 are now exclusive (entering the colour mode ends bending); G and R on a handle are Kanzashi's own, so the view can be orbited with the middle button meanwhile; R turns a handle, which changes the direction of the wire there, and the turn is kept after bending ends.
 
-## 0.4.0（試作）
+## 0.4.0
 
 - エージェント向けのスキル `skills/kanzashi/SKILL.md`（英語は `SKILL.en.md`）と入口 `AGENTS.md`。髪の調整の流れと、ユーザーに確認する所を決めた。
 - `scripts/kanzashi_run.py`：検出済みの髪は毛束を残して UV だけを作り直す。`--swap`（張り替え）、`--apply`（形の確定）、`--redetect`（検出のやり直し）を足した。UV の検査に落ちたときは終了コードが 1 になる。
@@ -27,7 +27,7 @@ English: a hair that got the strand UV is marked, and `scripts/kanzashi_guard.py
 
 English: a skill for agents (`skills/kanzashi/`), `kanzashi_run.py` keeps existing strands and gained `--swap`, `--apply`, `--redetect`; `kanzashi_preview.py` renders the strand colours; `tools/install_addon.py` checks and installs the add-on.
 
-## 0.3.0（試作）
+## 0.3.0
 
 動きは変えずに、コードを整理した。
 
@@ -39,7 +39,7 @@ English: a skill for agents (`skills/kanzashi/`), `kanzashi_run.py` keeps existi
 
 English: no change in behaviour. The code was split into smaller modules with relative imports, the operators were renamed to `kanzashi.*` (data names in files are unchanged, so older files keep working), an extension manifest was added, and the panel without installing is now started by `scripts/kanzashi_panel.py`.
 
-## 0.2.0（試作）
+## 0.2.0
 
 - パネルを日本語と英語で使えるようにした。いちばん上の欄で Auto／日本語／English を選ぶ（Auto は Blender の表示言語に合わせる）。
 - 英語の説明 `README.en.md`。
@@ -47,7 +47,7 @@ English: no change in behaviour. The code was split into smaller modules with re
 
 English: the panel now works in Japanese and English (Auto / 日本語 / English at the top of the panel), with an English README.
 
-## 0.1.0（試作）
+## 0.1.0
 
 - 毛束の検出、色の塗り直しによる付け替え、ワイヤーでの曲げ、毛束ごとの UV（検査・テクスチャ用の書き出し・張り替え・元に戻す）。
 - アドオン（パネル）と、パネルなしで動かすスクリプト `scripts/kanzashi_run.py`。
