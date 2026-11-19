@@ -12,7 +12,7 @@
 Kanzashi is a Blender add-on that lets you work on a generated hair mesh strand by strand.
 It splits the hair into strands, lets you fix the split by painting, bends each strand by a wire, and makes a UV map with one island per strand.
 
-- Version: 0.4.1
+- Version: 0.4.2
 - Tested with: Blender 5.3.0 on Windows 11. Other versions are untested.
 - Author: Lida
 - Lida × Tripo official collaboration
@@ -92,8 +92,8 @@ When an agent uses it, there is also a script that finds and fixes strands runni
 
 | What | BOOTH | GitHub |
 |---|---|---|
-| The add-on (install in Blender, use the panel) `Kanzashi-addon-0.4.1.zip` | yes | yes ([Release](https://github.com/Lida-V/Kanzashi/releases)) |
-| The scripts that run without the panel `Kanzashi-scripts-0.4.1.zip` | no | yes ([Release](https://github.com/Lida-V/Kanzashi/releases)) |
+| The add-on (install in Blender, use the panel) `Kanzashi-addon-0.4.2.zip` | yes | yes ([Release](https://github.com/Lida-V/Kanzashi/releases)) |
+| The scripts that run without the panel `Kanzashi-scripts-0.4.2.zip` | no | yes ([Release](https://github.com/Lida-V/Kanzashi/releases)) |
 | The skill for agents (`skills/kanzashi/`, with the script that finds and fixes buried strands) | no | yes (in this repository only) |
 
 - BOOTH (free): https://lidamidorin.booth.pm/items/9167843 . Only the add-on is there.
@@ -101,7 +101,7 @@ When an agent uses it, there is also a script that finds and fixes strands runni
 
 ## Install (add-on)
 
-1. Get `Kanzashi-addon-0.4.1.zip` (from BOOTH or the GitHub Release; `python tools/build_packages.py` also makes it in `dist/`).
+1. Get `Kanzashi-addon-0.4.2.zip` (from BOOTH or the GitHub Release; `python tools/build_packages.py` also makes it in `dist/`).
 2. In Blender, open Edit > Preferences > Add-ons, choose "Install from Disk" in the menu at the top right, and pick the ZIP (it is installed as an extension).
 3. Enable "Kanzashi".
 4. Open the sidebar of the 3D viewport (N key). There is a "Kanzashi" tab.
@@ -202,7 +202,7 @@ Press "Make the Strand UV". It takes tens of seconds. The result of the check is
 
 - "Apply Shape and Remove Setup" writes the bent shape into the mesh and removes the wires. After that you cannot bend again.
 
-The screens are from 0.4.1. The hair in the pictures is an example and is not in the repository.
+The screens are from 0.4.1 (0.4.2 differs only in the panel title). The hair in the pictures is an example and is not in the repository.
 
 When you come back to edit more, **do not detect again**; go to step 3. A second detection rebuilds everything, and your repainting and bending are lost.
 
@@ -221,7 +221,7 @@ The brush paints whole faces, so the size of the faces is the finest detail you 
 
 ## Without the panel (script)
 
-Unpack `Kanzashi-scripts-0.4.1.zip` and run it in the background. The opened file is not saved. It stops if the output already exists.
+Unpack `Kanzashi-scripts-0.4.2.zip` and run it in the background. The opened file is not saved. It stops if the output already exists.
 
 ```bash
 blender -b model.blend --python kanzashi_run.py -- --out model_kanzashi.blend --export hair.fbx --report report.json

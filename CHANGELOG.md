@@ -1,11 +1,13 @@
 # 変更履歴
 
-## 未リリース
+## 0.4.2
 
+- 「試作」の文言を外した（パネルの見出しは「Kanzashi（かんざし）」、README・変更履歴・スキル）。動きは 0.4.1 と同じ。
+- README（日本語・英語）：冒頭に「リダ × Tripo 公式コラボ」とロゴ（明暗のテーマで出し分け）を入れた。ソーシャルプレビュー画像（`docs/kanzashi_ogp.png`）も同じ表示に。
 - README（日本語・英語）：どういうアドオンか、何ができるかを図で説明した。図は `tools/make_figures.py` が描く模式図（`docs/fig_*.svg`）。実際の髪で撮った画像（パネルの画面、毛束ごとの色、曲げた例）も入れた。「使う順番」を、段ごとのパネルの画面つきの手順にした（`docs/step1〜6.ja.png`・`.en.png`）。配布している場所（BOOTH はアドオンだけ、GitHub はアドオン・スクリプト・スキル）を書いた。
 - スキル：工程の位置を決まりにした。頭と髪のパーツ分けの後、テクスチャを貼り直す前に行う。手順 0 で順番を確かめ、逆のときはユーザーに聞く。
 
-English: the READMEs now explain with figures what the add-on is and what it does (`docs/fig_*.svg`, drawn by `tools/make_figures.py`); the skill now fixes the place in the pipeline (after the head and the hair are split into parts, before the textures are redone) and checks it in step 0.
+English: the word "prototype" is gone (the panel title is now "Kanzashi（かんざし）"; behaviour is the same as 0.4.1); the READMEs show "Lida × Tripo official collaboration" with both logos; the READMEs now explain with figures what the add-on is and what it does (`docs/fig_*.svg`, drawn by `tools/make_figures.py`); the skill now fixes the place in the pipeline (after the head and the hair are split into parts, before the textures are redone) and checks it in step 0.
 
 ## 0.4.1
 

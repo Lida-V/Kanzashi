@@ -12,7 +12,7 @@
 Kanzashi は、3D 生成サービスで作った髪のメッシュを、毛束 1 本ずつ扱えるようにする Blender のアドオンです。
 髪を毛束に分け、分かれ方を塗って直し、ワイヤーで曲げ、毛束ごとの UV まで作ります。
 
-- 版：0.4.1
+- 版：0.4.2
 - 確かめた環境：Blender 5.3.0、Windows 11。ほかの版では試していません。
 - 作者：Lida
 - リダ × Tripo 公式コラボ
@@ -92,8 +92,8 @@ Blender の画面です。右のサイドバーの「Kanzashi」タブに 6 つ�
 
 | 中身 | BOOTH | GitHub |
 |---|---|---|
-| アドオン（Blender に入れて、パネルで使う）`Kanzashi-addon-0.4.1.zip` | ○ | ○（[Release](https://github.com/Lida-V/Kanzashi/releases)） |
-| パネルなしで動かすスクリプト `Kanzashi-scripts-0.4.1.zip` | × | ○（[Release](https://github.com/Lida-V/Kanzashi/releases)） |
+| アドオン（Blender に入れて、パネルで使う）`Kanzashi-addon-0.4.2.zip` | ○ | ○（[Release](https://github.com/Lida-V/Kanzashi/releases)） |
+| パネルなしで動かすスクリプト `Kanzashi-scripts-0.4.2.zip` | × | ○（[Release](https://github.com/Lida-V/Kanzashi/releases)） |
 | エージェント向けのスキル（`skills/kanzashi/`。貫通を調べる・直すスクリプトを含む） | × | ○（このリポジトリの中だけ） |
 
 - BOOTH（無料）：https://lidamidorin.booth.pm/items/9167843 。アドオンだけを配っています。
@@ -101,7 +101,7 @@ Blender の画面です。右のサイドバーの「Kanzashi」タブに 6 つ�
 
 ## 入れ方（アドオン）
 
-1. `Kanzashi-addon-0.4.1.zip` を用意します（BOOTH か GitHub の Release から。`python tools/build_packages.py` でも `dist/` に出来ます）。
+1. `Kanzashi-addon-0.4.2.zip` を用意します（BOOTH か GitHub の Release から。`python tools/build_packages.py` でも `dist/` に出来ます）。
 2. Blender の「編集 > プリファレンス > アドオン」の右上のメニューから「ディスクからインストール」を選び、ZIP を指定します（拡張機能として入ります）。
 3. 「Kanzashi」を有効にします。
 4. 3D ビューでサイドバー（N キー）を開くと、「Kanzashi」のタブがあります。
@@ -202,7 +202,7 @@ AI エージェントにこのリポジトリを読ませると、[AGENTS.md](AG
 
 - 「曲げた形を確定して仕組みを外す」は、曲げた形をメッシュに書き込み、ワイヤーを外します。押した後は曲げ直せません。
 
-画面は 0.4.1 の物です。画像の髪は作例で、リポジトリには入っていません。
+画面は 0.4.1 の物です（0.4.2 はパネルの見出しの文字だけ違います）。画像の髪は作例で、リポジトリには入っていません。
 
 続きの編集をするときは、**検出をやり直さず** ③ へ進みます。もう一度検出すると、塗り直しと曲げた形は作り直されて消えます。
 
@@ -219,7 +219,7 @@ AI エージェントにこのリポジトリを読ませると、[AGENTS.md](AG
 
 ## パネルなしで動かす（スクリプト）
 
-`Kanzashi-scripts-0.4.1.zip` を展開して、背景実行で使います。開いたファイルは保存しません。出力先がすでにあると止まります。
+`Kanzashi-scripts-0.4.2.zip` を展開して、背景実行で使います。開いたファイルは保存しません。出力先がすでにあると止まります。
 
 ```bash
 blender -b model.blend --python kanzashi_run.py -- --out model_kanzashi.blend --export hair.fbx --report report.json
